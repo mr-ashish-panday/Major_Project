@@ -4,7 +4,7 @@ CONFIG = {
     'model_dir': './models',
     'logs_dir': './logs',
     'arxiv_keywords': ['large language models', 'LLM fine-tuning'],
-    'min_papers_threshold': 50,  # Reduced for faster testing
+    'min_papers_threshold': 100,  # Reduced for faster testing
     'gpu_memory_limit': '12GB',
     'training_epochs': 3,  # Increased for better convergence on GPU
     'batch_size': 8,  # Increased for GPU parallelism; adjust down if OOM error occurs
