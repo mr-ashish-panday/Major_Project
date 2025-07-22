@@ -1,4 +1,6 @@
 import arxiv
+import os
+
 import logging
 from typing import List, Dict
 
@@ -11,7 +13,7 @@ class ExtractorAgent:
 
     def extract(self) -> List[Dict]:
         query = ' OR '.join(self.config['arxiv_keywords'])
-        search = arxiv.Search(query=query, max_results=100, sort_by=arxiv.SortCriterion.SubmittedDate)
+        search = arxiv.Search(query=query, max_results=50, sort_by=arxiv.SortCriterion.SubmittedDate)
         papers = []
         for result in self.arxiv_client.results(search):
             pdf_path = os.path.join(self.config['data_dir'], f"{result.entry_id.split('/')[-1]}.pdf")

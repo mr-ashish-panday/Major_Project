@@ -1,6 +1,8 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import evaluate
 import logging
+import os
+
 from typing import List, Dict
 
 logger = logging.getLogger(__name__)

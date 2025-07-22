@@ -3,6 +3,7 @@ import re
 import logging
 from transformers import AutoTokenizer
 from typing import List, Dict
+import os
 
 logger = logging.getLogger(__name__)
 
