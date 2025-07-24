@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Environment variables
-HUGGINGFACE_TOKEN = "REMOVED_FOR_SECURITY"
+HUGGINGFACE_TOKEN = "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"
 
 def run_pipeline():
     orchestrator = OrchestratorAgent(CONFIG)

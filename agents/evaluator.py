@@ -1,8 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import evaluate
 import logging
-import os
-
 from typing import List, Dict
 
 logger = logging.getLogger(__name__)
@@ -14,12 +12,11 @@ class EvaluatorAgent:
         self.rouge = evaluate.load('rouge')
 
     def evaluate(self, model_path: str, test_data: List[str]) -> Dict:
-        if not test_data:
-            raise ValueError("No test data provided.")
+        logger.info("Loading fine-tuned model for evaluation...")
         model = AutoModelForCausalLM.from_pretrained(model_path)
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(self.config['base_model'])  # Load tokenizer from base model
 
-        # Simplified perplexity (use full implementation for production)
+        # Perplexity (simplified placeholder; implement full calc if needed)
         perplexity = 0.0  # Placeholder: Compute via eval loss on test set
 
         predictions = []
