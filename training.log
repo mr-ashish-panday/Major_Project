@@ -1,0 +1,462 @@
+nohup: ignoring input
+2025-12-29 20:16:17,550 - __main__ - INFO - ============================================================
+2025-12-29 20:16:17,552 - __main__ - INFO - 🧠 ScholarMind - Self-Evolving LLM Research Assistant
+2025-12-29 20:16:17,552 - __main__ - INFO - ============================================================
+2025-12-29 20:16:17,552 - __main__ - INFO - HuggingFace token found.
+2025-12-29 20:16:17,835 - __main__ - INFO - GPU available: NVIDIA GeForce RTX 3080 Ti (12.6 GB)
+2025-12-29 20:16:17,839 - agents.orchestrator - INFO - ==================================================
+2025-12-29 20:16:17,839 - agents.orchestrator - INFO - Initializing ScholarMind Agents...
+2025-12-29 20:16:17,840 - agents.orchestrator - INFO - ==================================================
+2025-12-29 20:16:17,840 - agents.orchestrator - INFO - Initializing ExtractorAgent...
+2025-12-29 20:16:17,841 - agents.orchestrator - INFO - Initializing PreprocessorAgent...
+2025-12-29 20:16:19,403 - agents.orchestrator - INFO - Initializing ValidatorAgent...
+2025-12-29 20:16:19,403 - agents.validator - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-12-29 20:16:19,404 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2025-12-29 20:16:19,404 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-12-29 20:16:24,609 - agents.orchestrator - INFO - Initializing VectorStoreAgent...
+2025-12-29 20:16:24,613 - agents.vector_store - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-12-29 20:16:24,615 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2025-12-29 20:16:24,615 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-12-29 20:16:31,921 - agents.vector_store - INFO - Created new FAISS index with dimension 384
+2025-12-29 20:16:31,951 - agents.vector_store - INFO - VectorStoreAgent initialized. Index has 0 documents.
+2025-12-29 20:16:31,958 - agents.orchestrator - INFO - Initializing TrainerAgent...
+2025-12-29 20:16:31,960 - agents.trainer - INFO - Loading base model for training...
+2025-12-29 20:16:33,764 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - `flash-attention` package not found, consider installing for better performance: No module named 'flash_attn'.
+2025-12-29 20:16:33,765 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - Current `flash-attention` does not support `window_size`. Either upgrade or use `attn_implementation='eager'`.
+2025-12-29 20:16:36,758 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:52<00:52, 52.28s/it]Loading checkpoint shards: 100%|██████████| 2/2 [01:21<00:00, 38.43s/it]Loading checkpoint shards: 100%|██████████| 2/2 [01:21<00:00, 40.51s/it]
+2025-12-29 20:18:03,129 - agents.trainer - INFO - Trainable parameters: 18,950,144 / 2,028,090,368 (0.93%)
+2025-12-29 20:18:03,131 - agents.orchestrator - INFO - Initializing EvaluatorAgent...
+2025-12-29 20:18:13,331 - agents.orchestrator - INFO - Initializing SelfImprovementAgent...
+2025-12-29 20:18:13,334 - agents.orchestrator - INFO - All agents initialized successfully!
+2025-12-29 20:18:13,335 - agents.orchestrator - INFO - 
+==================================================
+2025-12-29 20:18:13,335 - agents.orchestrator - INFO - STEP 1: Extracting papers from arXiv...
+2025-12-29 20:18:13,335 - agents.orchestrator - INFO - ==================================================
+2025-12-29 20:18:13,337 - arxiv - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=0&max_results=100
+2025-12-29 20:18:15,041 - arxiv - INFO - Got first page: 100 of 2365415 total results
+2025-12-29 20:18:59,051 - agents.extractor - ERROR - Failed to download Proceedings First Workshop on Adaptable Cloud Architectures: HTTP Error 404: Not Found
+2025-12-29 20:19:34,571 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=100&max_results=100
+2025-12-29 20:20:11,071 - agents.extractor - INFO - Extracted 149 papers.
+2025-12-29 20:20:11,072 - agents.orchestrator - INFO - Extracted 149 papers
+2025-12-29 20:20:11,072 - agents.orchestrator - INFO - 
+==================================================
+2025-12-29 20:20:11,072 - agents.orchestrator - INFO - STEP 2: Preprocessing papers...
+2025-12-29 20:20:11,072 - agents.orchestrator - INFO - ==================================================
+2025-12-29 20:20:12,650 - agents.preprocessor - INFO - Preprocessed: Information Critical Phases under Decoherence... (2 chunks)
+Token indices sequence length is longer than the specified maximum sequence length for this model (9535 > 4096). Running this sequence through the model will result in indexing errors
+2025-12-29 20:20:13,508 - agents.preprocessor - INFO - Preprocessed: See Less, See Right: Bi-directional Perceptual Sha... (21 chunks)
+2025-12-29 20:20:14,553 - agents.preprocessor - INFO - Preprocessed: Charge-Informed Quantum Error Correction... (23 chunks)
+2025-12-29 20:20:15,423 - agents.preprocessor - INFO - Preprocessed: ProEdit: Inversion-based Editing From Prompts Done... (18 chunks)
+2025-12-29 20:20:16,200 - agents.preprocessor - INFO - Preprocessed: Radio Supernovae... (35 chunks)
+2025-12-29 20:20:16,463 - agents.preprocessor - INFO - Preprocessed: General Construction of Quantum Error-Correcting C... (28 chunks)
+2025-12-29 20:20:17,254 - agents.preprocessor - INFO - Preprocessed: Agentic Structured Graph Traversal for Root Cause ... (39 chunks)
+2025-12-29 20:20:18,138 - agents.preprocessor - INFO - Preprocessed: The Lepton-Gluon Portal Beyond Lepto-Gluons... (31 chunks)
+2025-12-29 20:20:19,135 - agents.preprocessor - INFO - Preprocessed: A simple realization of Weyl-Heisenberg covariant ... (37 chunks)
+2025-12-29 20:20:19,602 - agents.preprocessor - INFO - Preprocessed: Thermalization within a Stark manifold through Ryd... (18 chunks)
+2025-12-29 20:20:20,003 - agents.preprocessor - INFO - Preprocessed: Index-Tracking Portfolio Construction and Rebalanc... (4 chunks)
+2025-12-29 20:20:20,753 - agents.preprocessor - INFO - Preprocessed: Keffer-like form of the symmetric Heisenberg excha... (29 chunks)
+2025-12-29 20:20:21,242 - agents.preprocessor - INFO - Preprocessed: Hybrid Deep Reinforcement Learning for Joint Resou... (13 chunks)
+2025-12-29 20:20:21,521 - agents.preprocessor - INFO - Preprocessed: Pruning as a Game: Equilibrium-Driven Sparsificati... (15 chunks)
+2025-12-29 20:20:22,296 - agents.preprocessor - INFO - Preprocessed: Learning Association via Track-Detection Matching ... (21 chunks)
+2025-12-29 20:20:23,630 - agents.preprocessor - INFO - Preprocessed: Non-abelian soft radiation data for a celestial th... (62 chunks)
+2025-12-29 20:20:24,822 - agents.preprocessor - INFO - Preprocessed: Mass-to-Horizon Entropic Cosmology: A Unified Ther... (45 chunks)
+2025-12-29 20:20:26,576 - agents.preprocessor - INFO - Preprocessed: Explainable Multimodal Regression via Information ... (27 chunks)
+2025-12-29 20:20:26,950 - agents.preprocessor - INFO - Preprocessed: A2P-Vis: an Analyzer-to-Presenter Agentic Pipeline... (7 chunks)
+2025-12-29 20:20:29,682 - agents.preprocessor - INFO - Preprocessed: Introducing TrGLUE and SentiTurca: A Comprehensive... (102 chunks)
+2025-12-29 20:20:30,125 - agents.preprocessor - INFO - Preprocessed: Effect of Population Imbalance on Vortex Mass in S... (21 chunks)
+2025-12-29 20:20:31,207 - agents.preprocessor - INFO - Preprocessed: Exact inference via quasi-conjugacy in two-paramet... (60 chunks)
+2025-12-29 20:20:31,776 - agents.preprocessor - INFO - Preprocessed: Yume-1.5: A Text-Controlled Interactive World Gene... (20 chunks)
+2025-12-29 20:20:32,948 - agents.preprocessor - INFO - Preprocessed: Gauge Coupling Unification in Gauge-Higgs GUT: The... (54 chunks)
+2025-12-29 20:20:40,990 - agents.preprocessor - INFO - Preprocessed: A Minimal Network of Brain Dynamics: Hierarchy of ... (74 chunks)
+2025-12-29 20:20:43,177 - agents.preprocessor - INFO - Preprocessed: Flat space Fermionic Wave-function coeffients... (90 chunks)
+2025-12-29 20:20:43,541 - agents.preprocessor - INFO - Preprocessed: Factoriality and birational rigidity of two famili... (1 chunks)
+2025-12-29 20:20:45,303 - agents.preprocessor - INFO - Preprocessed: Abstraction of Trusted Execution Environments as t... (58 chunks)
+2025-12-29 20:20:45,898 - agents.preprocessor - INFO - Preprocessed: Schwarz Information Criterion Aided Multi-Armed Ba... (14 chunks)
+2025-12-29 20:20:46,505 - agents.preprocessor - INFO - Preprocessed: Unifying Learning Dynamics and Generalization in T... (21 chunks)
+2025-12-29 20:20:46,888 - agents.preprocessor - INFO - Preprocessed: Context as a Tool: Context Management for Long-Hor... (19 chunks)
+2025-12-29 20:20:47,443 - agents.preprocessor - INFO - Preprocessed: Unlocking klockmannite: formation of colloidal qua... (25 chunks)
+2025-12-29 20:20:48,668 - agents.preprocessor - INFO - Preprocessed: Searching for Cosmological Collider in the Planck ... (54 chunks)
+2025-12-29 20:20:49,276 - agents.preprocessor - INFO - Preprocessed: A Frobenius-Optimal Projection for Enforcing Linea... (8 chunks)
+2025-12-29 20:20:50,421 - agents.preprocessor - INFO - Preprocessed: Agent-based simulation of online social networks a... (36 chunks)
+2025-12-29 20:20:53,875 - agents.preprocessor - INFO - Preprocessed: Towards precise baryogenesis in the 2HDM$+a$... (93 chunks)
+2025-12-29 20:20:55,182 - agents.preprocessor - INFO - Preprocessed: Classifying Urban Regions by Aggregated Pollutant ... (62 chunks)
+2025-12-29 20:20:55,406 - agents.preprocessor - INFO - Preprocessed: Geometric Obstructions in Finsler Spaces and Torsi... (1 chunks)
+2025-12-29 20:20:57,543 - agents.preprocessor - INFO - Preprocessed: Heterogeneous fragmentation of empty sites promote... (54 chunks)
+2025-12-29 20:20:58,151 - agents.preprocessor - INFO - Preprocessed: ReSMT: An SMT-Based Tool for Reverse Engineering... (23 chunks)
+2025-12-29 20:20:59,512 - agents.preprocessor - INFO - Preprocessed: Primordial black holes and smooth coarse-graining ... (57 chunks)
+2025-12-29 20:21:01,490 - agents.preprocessor - INFO - Preprocessed: Semiperfect rings with a Nakayama permutation: A s... (73 chunks)
+2025-12-29 20:21:02,276 - agents.preprocessor - INFO - Preprocessed: Ferroelectricity in magnon Bose-Einstein condensat... (31 chunks)
+2025-12-29 20:21:03,918 - agents.preprocessor - INFO - Preprocessed: Rotationally invariant dynamical lattice regulator... (80 chunks)
+2025-12-29 20:21:04,394 - agents.preprocessor - INFO - Preprocessed: Next-to-leading order QCD corrections to electroma... (40 chunks)
+2025-12-29 20:21:05,009 - agents.preprocessor - INFO - Preprocessed: Scaling Adversarial Training via Data Selection... (10 chunks)
+2025-12-29 20:21:05,564 - agents.preprocessor - INFO - Preprocessed: On the Ergodic Capacity for SIM-Aided Holographic ... (16 chunks)
+2025-12-29 20:21:05,888 - agents.preprocessor - INFO - Preprocessed: Random state comonads encode cellular automata eva... (11 chunks)
+2025-12-29 20:21:06,259 - agents.preprocessor - INFO - Preprocessed: Prefill vs. Decode Bottlenecks: SRAM-Frequency Tra... (18 chunks)
+2025-12-29 20:21:07,044 - agents.preprocessor - INFO - Preprocessed: StreamAvatar: Streaming Diffusion Models for Real-... (21 chunks)
+2025-12-29 20:21:08,205 - agents.preprocessor - INFO - Preprocessed: Lax pairs for BKM hierarchy... (47 chunks)
+2025-12-29 20:21:12,000 - agents.preprocessor - INFO - Preprocessed: Existence of spectral submanifolds in time delay s... (115 chunks)
+2025-12-29 20:21:12,602 - agents.preprocessor - INFO - Preprocessed: Small-scale turbulent dynamo for low-Prandtl numbe... (29 chunks)
+2025-12-29 20:21:13,115 - agents.preprocessor - INFO - Preprocessed: Toward Secure and Compliant AI: Organizational Sta... (10 chunks)
+2025-12-29 20:21:13,759 - agents.preprocessor - INFO - Preprocessed: Signature for charged Higgs pair production in 2HD... (22 chunks)
+2025-12-29 20:21:14,754 - agents.preprocessor - INFO - Preprocessed: Spin dynamics in the van der Waals ferromagnet CrT... (29 chunks)
+2025-12-29 20:21:15,632 - agents.preprocessor - INFO - Preprocessed: Unified Royer law revision for alpha-decay half-li... (25 chunks)
+2025-12-29 20:21:16,431 - agents.preprocessor - INFO - Preprocessed: Enhanced Distributed Variational Quantum Eigensolv... (21 chunks)
+2025-12-29 20:21:16,679 - agents.preprocessor - INFO - Preprocessed: Why Smooth Stability Assumptions Fail for ReLU Lea... (9 chunks)
+2025-12-29 20:21:17,620 - agents.preprocessor - INFO - Preprocessed: Local identifiability of a parameter function in a... (51 chunks)
+2025-12-29 20:21:18,168 - agents.preprocessor - INFO - Preprocessed: Non-reciprocal circular dichroism of ferro-rotatio... (35 chunks)
+2025-12-29 20:21:18,329 - agents.preprocessor - INFO - Preprocessed: Quantum Secret Sharing Rates... (16 chunks)
+2025-12-29 20:21:18,422 - agents.preprocessor - INFO - Preprocessed: Classification and stability of black hole event h... (7 chunks)
+2025-12-29 20:21:19,911 - agents.preprocessor - INFO - Preprocessed: MAI-UI Technical Report: Real-World Centric Founda... (61 chunks)
+2025-12-29 20:21:21,300 - agents.preprocessor - INFO - Preprocessed: Backdoor Attacks on Prompt-Driven Video Segmentati... (38 chunks)
+2025-12-29 20:21:21,776 - agents.preprocessor - INFO - Preprocessed: Learning continually with representational drift... (7 chunks)
+2025-12-29 20:21:22,613 - agents.preprocessor - INFO - Preprocessed: Inferring Eccentricity of Binary Black Holes from ... (43 chunks)
+2025-12-29 20:21:24,338 - agents.preprocessor - INFO - Preprocessed: HALF: Process Hollowing Analysis Framework for Bin... (36 chunks)
+2025-12-29 20:21:24,721 - agents.preprocessor - INFO - Preprocessed: Esakia order-compactifications and locally Esakia ... (1 chunks)
+2025-12-29 20:21:25,033 - agents.preprocessor - INFO - Preprocessed: Towards an understanding of dipole-dipole interact... (12 chunks)
+2025-12-29 20:21:25,642 - agents.preprocessor - INFO - Preprocessed: Deep Learning Based Auction Design for Selling Agr... (27 chunks)
+2025-12-29 20:21:26,673 - agents.preprocessor - INFO - Preprocessed: Mean-Field Analysis and Optimal Control of a Dynam... (52 chunks)
+2025-12-29 20:21:27,584 - agents.preprocessor - INFO - Preprocessed: FUSCO: High-Performance Distributed Data Shuffling... (28 chunks)
+2025-12-29 20:21:28,753 - agents.preprocessor - INFO - Preprocessed: Robust Federated Fine-Tuning in Heterogeneous Netw... (43 chunks)
+2025-12-29 20:21:29,409 - agents.preprocessor - INFO - Preprocessed: Combinatorial characterzations of $T$-designs in t... (27 chunks)
+2025-12-29 20:21:29,828 - agents.preprocessor - INFO - Preprocessed: Context-Aware Intelligent Chatbot Framework Levera... (16 chunks)
+2025-12-29 20:21:30,399 - agents.preprocessor - INFO - Preprocessed: From In Silico to In Vitro: Evaluating Molecule Ge... (20 chunks)
+2025-12-29 20:21:32,111 - agents.preprocessor - INFO - Preprocessed: LibContinual: A Comprehensive Library towards Real... (49 chunks)
+2025-12-29 20:21:38,223 - agents.preprocessor - INFO - Preprocessed: Multiband optical variability on diverse timescale... (74 chunks)
+2025-12-29 20:21:39,463 - agents.preprocessor - INFO - Preprocessed: Patch-Discontinuity Mining for Generalized Deepfak... (36 chunks)
+2025-12-29 20:21:40,146 - agents.preprocessor - INFO - Preprocessed: Proton therapy range uncertainty reduction using v... (20 chunks)
+2025-12-29 20:21:40,300 - agents.preprocessor - INFO - Preprocessed: Direction Finding with Sparse Arrays Based on Vari... (12 chunks)
+2025-12-29 20:21:42,553 - agents.preprocessor - INFO - Preprocessed: Meta-Learning-Based Handover Management in NextG O... (49 chunks)
+2025-12-29 20:21:43,310 - agents.preprocessor - INFO - Preprocessed: Site-Order Optimization in the Density Matrix Reno... (34 chunks)
+2025-12-29 20:21:44,462 - agents.preprocessor - INFO - Preprocessed: Neutrino Textures from Modular $A_4$ Left--Right S... (44 chunks)
+2025-12-29 20:21:46,164 - agents.preprocessor - INFO - Preprocessed: Prediction intervals for quantile autoregression... (61 chunks)
+2025-12-29 20:21:46,705 - agents.preprocessor - INFO - Preprocessed: Necessary conditions for spin-resolved Josephson d... (22 chunks)
+2025-12-29 20:21:47,079 - agents.preprocessor - INFO - Preprocessed: SketchPlay: Intuitive Creation of Physically Reali... (19 chunks)
+2025-12-29 20:21:47,792 - agents.preprocessor - INFO - Preprocessed: Diffusion in Rugged Energy Landscapes in the Prese... (14 chunks)
+2025-12-29 20:21:48,498 - agents.preprocessor - INFO - Preprocessed: HWL-HIN: A Hypergraph-Level Hypergraph Isomorphism... (31 chunks)
+2025-12-29 20:21:49,014 - agents.preprocessor - INFO - Preprocessed: Generalized binomial edge ideals are Cartwright-St... (22 chunks)
+2025-12-29 20:21:49,663 - agents.preprocessor - INFO - Preprocessed: Fluctuations and Irreversibility: Historical and M... (30 chunks)
+2025-12-29 20:21:50,048 - agents.preprocessor - INFO - Preprocessed: LongFly: Long-Horizon UAV Vision-and-Language Navi... (32 chunks)
+2025-12-29 20:21:50,392 - agents.preprocessor - INFO - Preprocessed: iSHIFT: Lightweight Slow-Fast GUI Agent with Adapt... (20 chunks)
+2025-12-29 20:21:51,035 - agents.preprocessor - INFO - Preprocessed: Rethinking photonic nanojets: a new definition and... (11 chunks)
+2025-12-29 20:21:51,775 - agents.preprocessor - INFO - Preprocessed: DuaDeep-SeqAffinity: Dual-Stream Deep Learning Fra... (23 chunks)
+2025-12-29 20:21:52,677 - agents.preprocessor - INFO - Preprocessed: Data-free Asymptotics-Informed Operator Networks f... (25 chunks)
+2025-12-29 20:21:53,424 - agents.preprocessor - INFO - Preprocessed: Asymptotics for the spectrum of the Laplacian in t... (28 chunks)
+2025-12-29 20:22:11,380 - agents.preprocessor - INFO - Preprocessed: Cosmic-Ray-Constrained LSTM Model for Geomagnetic ... (36 chunks)
+2025-12-29 20:22:12,745 - agents.preprocessor - INFO - Preprocessed: The algebro-geometric aspect of the iterated limit... (75 chunks)
+2025-12-29 20:22:15,799 - agents.preprocessor - INFO - Preprocessed: Variational Quantum Eigensolver for Real-World Fin... (53 chunks)
+2025-12-29 20:22:16,470 - agents.preprocessor - INFO - Preprocessed: An application to a system of $(k,ρ)$-fractional H... (21 chunks)
+2025-12-29 20:22:16,923 - agents.preprocessor - INFO - Preprocessed: Look Closer! An Adversarial Parametric Editing Fra... (21 chunks)
+2025-12-29 20:22:18,132 - agents.preprocessor - INFO - Preprocessed: Multi-Satellite Multi-Stream Beamspace Massive MIM... (45 chunks)
+2025-12-29 20:22:18,972 - agents.preprocessor - INFO - Preprocessed: Sample volume as a key design parameter in affinit... (23 chunks)
+2025-12-29 20:22:20,084 - agents.preprocessor - INFO - Preprocessed: Interplay between electronic and phononic energy d... (27 chunks)
+2025-12-29 20:22:21,285 - agents.preprocessor - INFO - Preprocessed: Entanglement Islands and Thermodynamics of the Bla... (46 chunks)
+2025-12-29 20:22:22,188 - agents.preprocessor - INFO - Preprocessed: CO$_2$ Dissociative Sticking on Cu(110)... (40 chunks)
+2025-12-29 20:22:22,967 - agents.preprocessor - INFO - Preprocessed: Estimating the Role of Bag Constant and Modified T... (42 chunks)
+2025-12-29 20:22:25,492 - agents.preprocessor - INFO - Preprocessed: Spacetime Spins: Statistical mechanics for error c... (78 chunks)
+2025-12-29 20:22:26,906 - agents.preprocessor - INFO - Preprocessed: Multiscale filtration framework with nanoconfined ... (49 chunks)
+2025-12-29 20:22:29,265 - agents.preprocessor - INFO - Preprocessed: Multi-Objective Optimization with Desirability and... (42 chunks)
+2025-12-29 20:22:29,716 - agents.preprocessor - INFO - Preprocessed: The Color-Clinical Decoupling: Why Perceptual Cali... (17 chunks)
+2025-12-29 20:22:29,828 - agents.preprocessor - INFO - Preprocessed: Optimal Placement of Data Centers to Support Power... (7 chunks)
+2025-12-29 20:22:32,267 - agents.preprocessor - INFO - Preprocessed: Time-integrated Optimal Transport: A Robust Minima... (33 chunks)
+2025-12-29 20:22:32,850 - agents.preprocessor - INFO - Preprocessed: LVLM-Aided Alignment of Task-Specific Vision Model... (21 chunks)
+2025-12-29 20:22:33,326 - agents.preprocessor - INFO - Preprocessed: A Lightweight Multi-Scale Attention Framework for ... (27 chunks)
+2025-12-29 20:22:33,742 - agents.preprocessor - INFO - Preprocessed: Bab_Sak Robotic Intubation System (BRIS): A Learni... (18 chunks)
+2025-12-29 20:22:35,283 - agents.preprocessor - INFO - Preprocessed: Relating auxiliary field formulations of $4d$ dual... (74 chunks)
+2025-12-29 20:22:36,059 - agents.preprocessor - INFO - Preprocessed: A Sieve-based Estimator for Entropic Optimal Trans... (32 chunks)
+2025-12-29 20:22:36,359 - agents.preprocessor - INFO - Preprocessed: A 58-Addition, Rank-23 Scheme for General 3x3 Matr... (11 chunks)
+2025-12-29 20:22:36,773 - agents.preprocessor - INFO - Preprocessed: Impact of neglecting center-of-mass acceleration i... (23 chunks)
+2025-12-29 20:22:37,178 - agents.preprocessor - INFO - Preprocessed: Tunable Magnetic and Topological Phases in EuMnXBi... (27 chunks)
+2025-12-29 20:22:37,955 - agents.preprocessor - INFO - Preprocessed: Repeat times and a two-weight UST model... (56 chunks)
+2025-12-29 20:22:39,584 - agents.preprocessor - INFO - Preprocessed: Finite Groups of Random Walks in the Quarter Plane... (90 chunks)
+2025-12-29 20:22:39,718 - agents.preprocessor - INFO - Preprocessed: RT-Focuser: A Real-Time Lightweight Model for Edge... (6 chunks)
+2025-12-29 20:22:40,824 - agents.preprocessor - INFO - Preprocessed: Revealing the transient ionization dynamics and mo... (28 chunks)
+2025-12-29 20:22:41,608 - agents.preprocessor - INFO - Preprocessed: On Convergence of Regularized Barzilai-Borwein Met... (35 chunks)
+2025-12-29 20:22:41,845 - agents.preprocessor - INFO - Preprocessed: Post-Hopf algebroids, post-Lie-Rinehart algebras a... (1 chunks)
+2025-12-29 20:22:42,219 - agents.preprocessor - INFO - Preprocessed: StereoVLA: Enhancing Vision-Language-Action Models... (17 chunks)
+2025-12-29 20:22:42,515 - agents.preprocessor - INFO - Preprocessed: Positive Narrativity Enhances Sense of Agency towa... (13 chunks)
+2025-12-29 20:22:43,985 - agents.preprocessor - INFO - Preprocessed: BLEST: Blazingly Efficient BFS using Tensor Cores... (54 chunks)
+2025-12-29 20:22:45,006 - agents.preprocessor - INFO - Preprocessed: Topological constraints on the electronic band str... (38 chunks)
+2025-12-29 20:22:48,076 - agents.preprocessor - INFO - Preprocessed: The Tensor-Plus Calculus... (28 chunks)
+2025-12-29 20:22:49,081 - agents.preprocessor - INFO - Preprocessed: Perceive and Calibrate: Analyzing and Enhancing Ro... (27 chunks)
+2025-12-29 20:22:51,484 - agents.preprocessor - INFO - Preprocessed: Topological properties of generalized Markoff mod ... (107 chunks)
+2025-12-29 20:22:52,301 - agents.preprocessor - INFO - Preprocessed: Linear Program Witness for Network Nonlocality in ... (39 chunks)
+2025-12-29 20:22:53,117 - agents.preprocessor - INFO - Preprocessed: Topology of non-collapsed three-dimensional RCD sp... (1 chunks)
+2025-12-29 20:22:53,652 - agents.preprocessor - INFO - Preprocessed: Modeling high dimensional point clouds with the sp... (22 chunks)
+2025-12-29 20:23:16,148 - agents.preprocessor - INFO - Preprocessed: Flow morphology and patterns in porous media conve... (53 chunks)
+2025-12-29 20:23:16,641 - agents.preprocessor - INFO - Preprocessed: The Wiener Path Integral Interpretation of the 3:1... (25 chunks)
+2025-12-29 20:23:17,118 - agents.preprocessor - INFO - Preprocessed: Self-attention vector output similarities reveal h... (15 chunks)
+2025-12-29 20:23:17,413 - agents.preprocessor - INFO - Preprocessed: Superradiant and dynamical spin-down of neutron st... (19 chunks)
+2025-12-29 20:23:17,937 - agents.preprocessor - INFO - Preprocessed: Latency-Optimal Cache-aided Multicast Streaming vi... (17 chunks)
+2025-12-29 20:23:18,559 - agents.preprocessor - INFO - Preprocessed: Phase-Coherent D-MIMO ISAC: Multi-Target Estimatio... (20 chunks)
+2025-12-29 20:23:19,112 - agents.preprocessor - INFO - Preprocessed: Characterizing Fungal Infections in the All of Us ... (21 chunks)
+2025-12-29 20:23:19,863 - agents.preprocessor - INFO - Preprocessed: Tuning diffusioosmosis of electrolyte solutions by... (54 chunks)
+2025-12-29 20:23:20,207 - agents.preprocessor - INFO - Preprocessed: Acyclic subgraphs of digraphs with high chromatic ... (24 chunks)
+2025-12-29 20:23:20,513 - agents.preprocessor - INFO - Preprocessed: WST spectroscopic variability alerts: discovery sp... (11 chunks)
+2025-12-29 20:23:20,514 - agents.preprocessor - INFO - Preprocessed 149 out of 149 papers
+2025-12-29 20:23:20,517 - agents.orchestrator - INFO - Preprocessed 149 papers
+2025-12-29 20:23:20,517 - agents.orchestrator - INFO - 
+==================================================
+2025-12-29 20:23:20,517 - agents.orchestrator - INFO - STEP 3: Validating papers...
+2025-12-29 20:23:20,517 - agents.orchestrator - INFO - ==================================================
+2025-12-29 20:23:20,521 - agents.validator - INFO - Discarded (low relevance): Information Critical Phases under Decoherence...
+2025-12-29 20:23:20,528 - agents.validator - INFO - Discarded (low relevance): See Less, See Right: Bi-directional Perceptual Sha...
+2025-12-29 20:23:20,533 - agents.validator - INFO - Discarded (low relevance): Charge-Informed Quantum Error Correction...
+2025-12-29 20:23:20,538 - agents.validator - INFO - Discarded (low relevance): ProEdit: Inversion-based Editing From Prompts Done...
+2025-12-29 20:23:20,545 - agents.validator - INFO - Discarded (low relevance): Radio Supernovae...
+2025-12-29 20:23:20,550 - agents.validator - INFO - Discarded (low relevance): General Construction of Quantum Error-Correcting C...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:01<00:00,  1.37s/it]Batches: 100%|██████████| 1/1 [00:01<00:00,  1.38s/it]
+2025-12-29 20:23:21,993 - agents.validator - INFO - Validated: Agentic Structured Graph Traversal for Root Cause ...
+2025-12-29 20:23:22,007 - agents.validator - INFO - Discarded (low relevance): The Lepton-Gluon Portal Beyond Lepto-Gluons...
+2025-12-29 20:23:22,020 - agents.validator - INFO - Discarded (low relevance): A simple realization of Weyl-Heisenberg covariant ...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 12.66it/s]
+2025-12-29 20:23:22,149 - agents.validator - INFO - Validated: Thermalization within a Stark manifold through Ryd...
+2025-12-29 20:23:22,154 - agents.validator - INFO - Discarded (low relevance): Index-Tracking Portfolio Construction and Rebalanc...
+2025-12-29 20:23:22,163 - agents.validator - INFO - Discarded (low relevance): Keffer-like form of the symmetric Heisenberg excha...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.65it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.22it/s]
+2025-12-29 20:23:22,665 - agents.validator - INFO - Validated: Hybrid Deep Reinforcement Learning for Joint Resou...
+2025-12-29 20:23:22,683 - agents.validator - INFO - Discarded (low relevance): Pruning as a Game: Equilibrium-Driven Sparsificati...
+2025-12-29 20:23:22,699 - agents.validator - INFO - Discarded (low relevance): Learning Association via Track-Detection Matching ...
+2025-12-29 20:23:22,735 - agents.validator - INFO - Discarded (low relevance): Non-abelian soft radiation data for a celestial th...
+2025-12-29 20:23:22,755 - agents.validator - INFO - Discarded (low relevance): Mass-to-Horizon Entropic Cosmology: A Unified Ther...
+2025-12-29 20:23:22,765 - agents.validator - INFO - Discarded (low relevance): Explainable Multimodal Regression via Information ...
+2025-12-29 20:23:22,769 - agents.validator - INFO - Discarded (low relevance): A2P-Vis: an Analyzer-to-Presenter Agentic Pipeline...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 27.14it/s]
+2025-12-29 20:23:22,853 - agents.validator - INFO - Validated: Introducing TrGLUE and SentiTurca: A Comprehensive...
+2025-12-29 20:23:22,858 - agents.validator - INFO - Discarded (low relevance): Effect of Population Imbalance on Vortex Mass in S...
+2025-12-29 20:23:22,868 - agents.validator - INFO - Discarded (low relevance): Exact inference via quasi-conjugacy in two-paramet...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 28.64it/s]
+2025-12-29 20:23:22,921 - agents.validator - INFO - Validated: Yume-1.5: A Text-Controlled Interactive World Gene...
+2025-12-29 20:23:22,931 - agents.validator - INFO - Discarded (low relevance): Gauge Coupling Unification in Gauge-Higgs GUT: The...
+2025-12-29 20:23:22,942 - agents.validator - INFO - Discarded (low relevance): A Minimal Network of Brain Dynamics: Hierarchy of ...
+2025-12-29 20:23:22,953 - agents.validator - INFO - Discarded (low relevance): Flat space Fermionic Wave-function coeffients...
+2025-12-29 20:23:22,954 - agents.validator - INFO - Discarded (low relevance): Factoriality and birational rigidity of two famili...
+2025-12-29 20:23:22,966 - agents.validator - INFO - Discarded (low relevance): Abstraction of Trusted Execution Environments as t...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 21.27it/s]
+2025-12-29 20:23:23,039 - agents.validator - INFO - Validated: Schwarz Information Criterion Aided Multi-Armed Ba...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.68it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.67it/s]
+2025-12-29 20:23:23,448 - agents.validator - INFO - Validated: Unifying Learning Dynamics and Generalization in T...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 16.50it/s]
+2025-12-29 20:23:23,543 - agents.validator - INFO - Validated: Context as a Tool: Context Management for Long-Hor...
+2025-12-29 20:23:23,554 - agents.validator - INFO - Discarded (low relevance): Unlocking klockmannite: formation of colloidal qua...
+2025-12-29 20:23:23,572 - agents.validator - INFO - Discarded (low relevance): Searching for Cosmological Collider in the Planck ...
+2025-12-29 20:23:23,575 - agents.validator - INFO - Discarded (low relevance): A Frobenius-Optimal Projection for Enforcing Linea...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 17.11it/s]
+2025-12-29 20:23:23,666 - agents.validator - INFO - Validated: Agent-based simulation of online social networks a...
+2025-12-29 20:23:23,682 - agents.validator - INFO - Discarded (low relevance): Towards precise baryogenesis in the 2HDM$+a$...
+2025-12-29 20:23:23,698 - agents.validator - INFO - Discarded (low relevance): Classifying Urban Regions by Aggregated Pollutant ...
+2025-12-29 20:23:23,699 - agents.validator - INFO - Discarded (low relevance): Geometric Obstructions in Finsler Spaces and Torsi...
+2025-12-29 20:23:23,714 - agents.validator - INFO - Discarded (low relevance): Heterogeneous fragmentation of empty sites promote...
+2025-12-29 20:23:23,722 - agents.validator - INFO - Discarded (low relevance): ReSMT: An SMT-Based Tool for Reverse Engineering...
+2025-12-29 20:23:23,734 - agents.validator - INFO - Discarded (low relevance): Primordial black holes and smooth coarse-graining ...
+2025-12-29 20:23:23,751 - agents.validator - INFO - Discarded (low relevance): Semiperfect rings with a Nakayama permutation: A s...
+2025-12-29 20:23:23,756 - agents.validator - INFO - Discarded (low relevance): Ferroelectricity in magnon Bose-Einstein condensat...
+2025-12-29 20:23:23,770 - agents.validator - INFO - Discarded (low relevance): Rotationally invariant dynamical lattice regulator...
+2025-12-29 20:23:23,775 - agents.validator - INFO - Discarded (low relevance): Next-to-leading order QCD corrections to electroma...
+2025-12-29 20:23:23,777 - agents.validator - INFO - Discarded (low relevance): Scaling Adversarial Training via Data Selection...
+2025-12-29 20:23:23,781 - agents.validator - INFO - Discarded (low relevance): On the Ergodic Capacity for SIM-Aided Holographic ...
+2025-12-29 20:23:23,786 - agents.validator - INFO - Discarded (low relevance): Random state comonads encode cellular automata eva...
+2025-12-29 20:23:23,799 - agents.validator - INFO - Discarded (low relevance): Prefill vs. Decode Bottlenecks: SRAM-Frequency Tra...
+2025-12-29 20:23:23,827 - agents.validator - INFO - Discarded (low relevance): StreamAvatar: Streaming Diffusion Models for Real-...
+2025-12-29 20:23:24,224 - agents.validator - INFO - Discarded (low relevance): Lax pairs for BKM hierarchy...
+2025-12-29 20:23:24,277 - agents.validator - INFO - Discarded (low relevance): Existence of spectral submanifolds in time delay s...
+2025-12-29 20:23:24,289 - agents.validator - INFO - Discarded (low relevance): Small-scale turbulent dynamo for low-Prandtl numbe...
+2025-12-29 20:23:24,294 - agents.validator - INFO - Discarded (low relevance): Toward Secure and Compliant AI: Organizational Sta...
+2025-12-29 20:23:24,299 - agents.validator - INFO - Discarded (low relevance): Signature for charged Higgs pair production in 2HD...
+2025-12-29 20:23:24,309 - agents.validator - INFO - Discarded (low relevance): Spin dynamics in the van der Waals ferromagnet CrT...
+2025-12-29 20:23:24,315 - agents.validator - INFO - Discarded (low relevance): Unified Royer law revision for alpha-decay half-li...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 18.01it/s]
+2025-12-29 20:23:24,403 - agents.validator - INFO - Validated: Enhanced Distributed Variational Quantum Eigensolv...
+2025-12-29 20:23:24,408 - agents.validator - INFO - Discarded (low relevance): Why Smooth Stability Assumptions Fail for ReLU Lea...
+2025-12-29 20:23:24,416 - agents.validator - INFO - Discarded (low relevance): Local identifiability of a parameter function in a...
+2025-12-29 20:23:24,423 - agents.validator - INFO - Discarded (low relevance): Non-reciprocal circular dichroism of ferro-rotatio...
+2025-12-29 20:23:24,426 - agents.validator - INFO - Discarded (low relevance): Quantum Secret Sharing Rates...
+2025-12-29 20:23:24,429 - agents.validator - INFO - Discarded (low relevance): Classification and stability of black hole event h...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 29.72it/s]
+2025-12-29 20:23:24,491 - agents.validator - INFO - Validated: MAI-UI Technical Report: Real-World Centric Founda...
+2025-12-29 20:23:24,507 - agents.validator - INFO - Discarded (low relevance): Backdoor Attacks on Prompt-Driven Video Segmentati...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 23.64it/s]
+2025-12-29 20:23:24,573 - agents.validator - INFO - Validated: Learning continually with representational drift...
+2025-12-29 20:23:24,578 - agents.validator - INFO - Discarded (low relevance): Inferring Eccentricity of Binary Black Holes from ...
+2025-12-29 20:23:24,585 - agents.validator - INFO - Discarded (low relevance): HALF: Process Hollowing Analysis Framework for Bin...
+2025-12-29 20:23:24,585 - agents.validator - INFO - Discarded (low relevance): Esakia order-compactifications and locally Esakia ...
+2025-12-29 20:23:24,587 - agents.validator - INFO - Discarded (low relevance): Towards an understanding of dipole-dipole interact...
+2025-12-29 20:23:24,591 - agents.validator - INFO - Discarded (low relevance): Deep Learning Based Auction Design for Selling Agr...
+2025-12-29 20:23:24,600 - agents.validator - INFO - Discarded (low relevance): Mean-Field Analysis and Optimal Control of a Dynam...
+2025-12-29 20:23:24,610 - agents.validator - INFO - Discarded (low relevance): FUSCO: High-Performance Distributed Data Shuffling...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.56it/s]Batches: 100%|██████████| 1/1 [00:00<00:00,  2.54it/s]
+2025-12-29 20:23:25,053 - agents.validator - INFO - Validated: Robust Federated Fine-Tuning in Heterogeneous Netw...
+2025-12-29 20:23:25,061 - agents.validator - INFO - Discarded (low relevance): Combinatorial characterzations of $T$-designs in t...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 19.19it/s]
+2025-12-29 20:23:25,148 - agents.validator - INFO - Validated: Context-Aware Intelligent Chatbot Framework Levera...
+2025-12-29 20:23:25,156 - agents.validator - INFO - Discarded (low relevance): From In Silico to In Vitro: Evaluating Molecule Ge...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 28.16it/s]
+2025-12-29 20:23:25,228 - agents.validator - INFO - Validated: LibContinual: A Comprehensive Library towards Real...
+2025-12-29 20:23:25,243 - agents.validator - INFO - Discarded (low relevance): Multiband optical variability on diverse timescale...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 19.37it/s]
+2025-12-29 20:23:25,338 - agents.validator - INFO - Validated: Patch-Discontinuity Mining for Generalized Deepfak...
+2025-12-29 20:23:25,347 - agents.validator - INFO - Discarded (low relevance): Proton therapy range uncertainty reduction using v...
+2025-12-29 20:23:25,350 - agents.validator - INFO - Discarded (low relevance): Direction Finding with Sparse Arrays Based on Vari...
+2025-12-29 20:23:25,365 - agents.validator - INFO - Discarded (low relevance): Meta-Learning-Based Handover Management in NextG O...
+2025-12-29 20:23:25,374 - agents.validator - INFO - Discarded (low relevance): Site-Order Optimization in the Density Matrix Reno...
+2025-12-29 20:23:25,384 - agents.validator - INFO - Discarded (low relevance): Neutrino Textures from Modular $A_4$ Left--Right S...
+2025-12-29 20:23:25,664 - agents.validator - INFO - Discarded (low relevance): Prediction intervals for quantile autoregression...
+2025-12-29 20:23:25,702 - agents.validator - INFO - Discarded (low relevance): Necessary conditions for spin-resolved Josephson d...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 18.05it/s]
+2025-12-29 20:23:25,821 - agents.validator - INFO - Validated: SketchPlay: Intuitive Creation of Physically Reali...
+2025-12-29 20:23:25,826 - agents.validator - INFO - Discarded (low relevance): Diffusion in Rugged Energy Landscapes in the Prese...
+2025-12-29 20:23:25,832 - agents.validator - INFO - Discarded (low relevance): HWL-HIN: A Hypergraph-Level Hypergraph Isomorphism...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 26.98it/s]
+2025-12-29 20:23:25,894 - agents.validator - INFO - Validated: Generalized binomial edge ideals are Cartwright-St...
+2025-12-29 20:23:25,901 - agents.validator - INFO - Discarded (low relevance): Fluctuations and Irreversibility: Historical and M...
+2025-12-29 20:23:25,905 - agents.validator - INFO - Discarded (low relevance): LongFly: Long-Horizon UAV Vision-and-Language Navi...
+2025-12-29 20:23:25,908 - agents.validator - INFO - Discarded (low relevance): iSHIFT: Lightweight Slow-Fast GUI Agent with Adapt...
+2025-12-29 20:23:25,909 - agents.validator - INFO - Discarded (low relevance): Rethinking photonic nanojets: a new definition and...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 35.62it/s]
+2025-12-29 20:23:25,959 - agents.validator - INFO - Validated: DuaDeep-SeqAffinity: Dual-Stream Deep Learning Fra...
+2025-12-29 20:23:25,965 - agents.validator - INFO - Discarded (low relevance): Data-free Asymptotics-Informed Operator Networks f...
+2025-12-29 20:23:25,970 - agents.validator - INFO - Discarded (low relevance): Asymptotics for the spectrum of the Laplacian in t...
+2025-12-29 20:23:25,980 - agents.validator - INFO - Discarded (low relevance): Cosmic-Ray-Constrained LSTM Model for Geomagnetic ...
+2025-12-29 20:23:25,987 - agents.validator - INFO - Discarded (low relevance): The algebro-geometric aspect of the iterated limit...
+2025-12-29 20:23:25,996 - agents.validator - INFO - Discarded (low relevance): Variational Quantum Eigensolver for Real-World Fin...
+2025-12-29 20:23:25,999 - agents.validator - INFO - Discarded (low relevance): An application to a system of $(k,ρ)$-fractional H...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 17.09it/s]
+2025-12-29 20:23:26,098 - agents.validator - INFO - Validated: Look Closer! An Adversarial Parametric Editing Fra...
+2025-12-29 20:23:26,112 - agents.validator - INFO - Discarded (low relevance): Multi-Satellite Multi-Stream Beamspace Massive MIM...
+2025-12-29 20:23:26,122 - agents.validator - INFO - Discarded (low relevance): Sample volume as a key design parameter in affinit...
+2025-12-29 20:23:26,310 - agents.validator - INFO - Discarded (low relevance): Interplay between electronic and phononic energy d...
+2025-12-29 20:23:26,339 - agents.validator - INFO - Discarded (low relevance): Entanglement Islands and Thermodynamics of the Bla...
+2025-12-29 20:23:26,359 - agents.validator - INFO - Discarded (low relevance): CO$_2$ Dissociative Sticking on Cu(110)...
+2025-12-29 20:23:26,371 - agents.validator - INFO - Discarded (low relevance): Estimating the Role of Bag Constant and Modified T...
+2025-12-29 20:23:26,397 - agents.validator - INFO - Discarded (low relevance): Spacetime Spins: Statistical mechanics for error c...
+2025-12-29 20:23:26,413 - agents.validator - INFO - Discarded (low relevance): Multiscale filtration framework with nanoconfined ...
+2025-12-29 20:23:26,420 - agents.validator - INFO - Discarded (low relevance): Multi-Objective Optimization with Desirability and...
+2025-12-29 20:23:26,424 - agents.validator - INFO - Discarded (low relevance): The Color-Clinical Decoupling: Why Perceptual Cali...
+2025-12-29 20:23:26,426 - agents.validator - INFO - Discarded (low relevance): Optimal Placement of Data Centers to Support Power...
+2025-12-29 20:23:26,431 - agents.validator - INFO - Discarded (low relevance): Time-integrated Optimal Transport: A Robust Minima...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 21.86it/s]
+2025-12-29 20:23:26,510 - agents.validator - INFO - Validated: LVLM-Aided Alignment of Task-Specific Vision Model...
+2025-12-29 20:23:26,519 - agents.validator - INFO - Discarded (low relevance): A Lightweight Multi-Scale Attention Framework for ...
+2025-12-29 20:23:26,525 - agents.validator - INFO - Discarded (low relevance): Bab_Sak Robotic Intubation System (BRIS): A Learni...
+2025-12-29 20:23:26,538 - agents.validator - INFO - Discarded (low relevance): Relating auxiliary field formulations of $4d$ dual...
+2025-12-29 20:23:26,544 - agents.validator - INFO - Discarded (low relevance): A Sieve-based Estimator for Entropic Optimal Trans...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 23.82it/s]
+2025-12-29 20:23:26,621 - agents.validator - INFO - Validated: A 58-Addition, Rank-23 Scheme for General 3x3 Matr...
+2025-12-29 20:23:26,628 - agents.validator - INFO - Discarded (low relevance): Impact of neglecting center-of-mass acceleration i...
+2025-12-29 20:23:26,635 - agents.validator - INFO - Discarded (low relevance): Tunable Magnetic and Topological Phases in EuMnXBi...
+2025-12-29 20:23:26,645 - agents.validator - INFO - Discarded (low relevance): Repeat times and a two-weight UST model...
+2025-12-29 20:23:26,661 - agents.validator - INFO - Discarded (low relevance): Finite Groups of Random Walks in the Quarter Plane...
+2025-12-29 20:23:26,665 - agents.validator - INFO - Discarded (low relevance): RT-Focuser: A Real-Time Lightweight Model for Edge...
+2025-12-29 20:23:26,674 - agents.validator - INFO - Discarded (low relevance): Revealing the transient ionization dynamics and mo...
+2025-12-29 20:23:26,681 - agents.validator - INFO - Discarded (low relevance): On Convergence of Regularized Barzilai-Borwein Met...
+2025-12-29 20:23:26,682 - agents.validator - INFO - Discarded (low relevance): Post-Hopf algebroids, post-Lie-Rinehart algebras a...
+2025-12-29 20:23:26,687 - agents.validator - INFO - Discarded (low relevance): StereoVLA: Enhancing Vision-Language-Action Models...
+2025-12-29 20:23:26,692 - agents.validator - INFO - Discarded (low relevance): Positive Narrativity Enhances Sense of Agency towa...
+2025-12-29 20:23:26,709 - agents.validator - INFO - Discarded (low relevance): BLEST: Blazingly Efficient BFS using Tensor Cores...
+2025-12-29 20:23:26,720 - agents.validator - INFO - Discarded (low relevance): Topological constraints on the electronic band str...
+2025-12-29 20:23:27,109 - agents.validator - INFO - Discarded (low relevance): The Tensor-Plus Calculus...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 21.85it/s]
+2025-12-29 20:23:27,213 - agents.validator - INFO - Validated: Perceive and Calibrate: Analyzing and Enhancing Ro...
+2025-12-29 20:23:27,230 - agents.validator - INFO - Discarded (low relevance): Topological properties of generalized Markoff mod ...
+2025-12-29 20:23:27,238 - agents.validator - INFO - Discarded (low relevance): Linear Program Witness for Network Nonlocality in ...
+2025-12-29 20:23:27,239 - agents.validator - INFO - Discarded (low relevance): Topology of non-collapsed three-dimensional RCD sp...
+2025-12-29 20:23:27,245 - agents.validator - INFO - Discarded (low relevance): Modeling high dimensional point clouds with the sp...
+2025-12-29 20:23:27,254 - agents.validator - INFO - Discarded (low relevance): Flow morphology and patterns in porous media conve...
+2025-12-29 20:23:27,257 - agents.validator - INFO - Discarded (low relevance): The Wiener Path Integral Interpretation of the 3:1...
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 21.28it/s]
+2025-12-29 20:23:27,340 - agents.validator - INFO - Validated: Self-attention vector output similarities reveal h...
+2025-12-29 20:23:27,347 - agents.validator - INFO - Discarded (low relevance): Superradiant and dynamical spin-down of neutron st...
+2025-12-29 20:23:27,351 - agents.validator - INFO - Discarded (low relevance): Latency-Optimal Cache-aided Multicast Streaming vi...
+2025-12-29 20:23:27,354 - agents.validator - INFO - Discarded (low relevance): Phase-Coherent D-MIMO ISAC: Multi-Target Estimatio...
+2025-12-29 20:23:27,356 - agents.validator - INFO - Discarded (low relevance): Characterizing Fungal Infections in the All of Us ...
+2025-12-29 20:23:27,365 - agents.validator - INFO - Discarded (low relevance): Tuning diffusioosmosis of electrolyte solutions by...
+2025-12-29 20:23:27,368 - agents.validator - INFO - Discarded (low relevance): Acyclic subgraphs of digraphs with high chromatic ...
+2025-12-29 20:23:27,370 - agents.validator - INFO - Discarded (low relevance): WST spectroscopic variability alerts: discovery sp...
+2025-12-29 20:23:27,387 - agents.validator - INFO - Validated 24 out of 149 papers
+2025-12-29 20:23:27,388 - agents.orchestrator - INFO - Validated 24 papers
+2025-12-29 20:23:27,388 - agents.orchestrator - INFO - 
+==================================================
+2025-12-29 20:23:27,388 - agents.orchestrator - INFO - STEP 4: Storing papers in vector database...
+2025-12-29 20:23:27,389 - agents.orchestrator - INFO - ==================================================
+2025-12-29 20:23:27,397 - agents.vector_store - INFO - Generating embeddings for 674 chunks...
+Batches:   0%|          | 0/22 [00:00<?, ?it/s]Batches:   5%|▍         | 1/22 [00:00<00:03,  6.59it/s]Batches:   9%|▉         | 2/22 [00:00<00:08,  2.41it/s]Batches:  14%|█▎        | 3/22 [00:00<00:05,  3.33it/s]Batches:  23%|██▎       | 5/22 [00:01<00:03,  5.43it/s]Batches:  27%|██▋       | 6/22 [00:01<00:04,  3.31it/s]Batches:  32%|███▏      | 7/22 [00:01<00:03,  4.08it/s]Batches:  36%|███▋      | 8/22 [00:01<00:02,  4.76it/s]Batches:  41%|████      | 9/22 [00:02<00:03,  3.99it/s]Batches:  45%|████▌     | 10/22 [00:02<00:02,  4.74it/s]Batches:  50%|█████     | 11/22 [00:02<00:03,  3.56it/s]Batches:  55%|█████▍    | 12/22 [00:02<00:02,  4.26it/s]Batches:  59%|█████▉    | 13/22 [00:03<00:01,  5.05it/s]Batches:  64%|██████▎   | 14/22 [00:03<00:02,  3.78it/s]Batches:  68%|██████▊   | 15/22 [00:03<00:02,  3.46it/s]Batches:  77%|███████▋  | 17/22 [00:04<00:01,  4.85it/s]Batches:  82%|████████▏ | 18/22 [00:04<00:01,  3.62it/s]Batches:  91%|█████████ | 20/22 [00:04<00:00,  5.11it/s]Batches:  95%|█████████▌| 21/22 [00:05<00:00,  4.16it/s]Batches: 100%|██████████| 22/22 [00:05<00:00,  3.61it/s]Batches: 100%|██████████| 22/22 [00:05<00:00,  4.00it/s]
+2025-12-29 20:23:33,451 - agents.vector_store - INFO - Saved index with 674 documents.
+2025-12-29 20:23:33,452 - agents.vector_store - INFO - Added 674 chunks. Total: 674
+2025-12-29 20:23:33,453 - agents.orchestrator - INFO - Added 674 chunks to vector store
+2025-12-29 20:23:33,453 - agents.orchestrator - INFO - Vector store now has 674 total documents
+2025-12-29 20:23:33,454 - agents.orchestrator - INFO - 
+==================================================
+2025-12-29 20:23:33,454 - agents.orchestrator - INFO - STEP 5: Fine-tuning the model...
+2025-12-29 20:23:33,454 - agents.orchestrator - INFO - ==================================================
+2025-12-29 20:23:33,454 - agents.trainer - INFO - Preparing training data...
+2025-12-29 20:23:33,464 - agents.trainer - INFO - Prepared 674 training samples
+/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/huggingface_hub/utils/_deprecation.py:100: FutureWarning: Deprecated argument(s) used in '__init__': dataset_text_field, max_seq_length. Will not be supported from version '0.13.0'.
+
+Deprecated positional argument(s) used in SFTTrainer, please use the SFTConfig to set these arguments instead.
+  warnings.warn(message, FutureWarning)
+/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/trl/trainer/sft_trainer.py:300: UserWarning: You passed a `max_seq_length` argument to the SFTTrainer, the value you passed will override the one in the `SFTConfig`.
+  warnings.warn(
+/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/trl/trainer/sft_trainer.py:328: UserWarning: You passed a `dataset_text_field` argument to the SFTTrainer, the value you passed will override the one in the `SFTConfig`.
+  warnings.warn(
+Map:   0%|          | 0/674 [00:00<?, ? examples/s]Map: 100%|██████████| 674/674 [00:02<00:00, 320.88 examples/s]Map: 100%|██████████| 674/674 [00:02<00:00, 312.77 examples/s]
+/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/trl/trainer/sft_trainer.py:403: UserWarning: You passed a processing_class with `padding_side` not equal to `right` to the SFTTrainer. This might lead to some unexpected behaviour due to overflow issues when training a model in half-precision. You might consider adding `processing_class.padding_side = 'right'` to your code.
+  warnings.warn(
+2025-12-29 20:23:43,873 - agents.trainer - INFO - Starting training...
+  0%|          | 0/126 [00:00<?, ?it/s]2025-12-29 20:23:48,979 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+2025-12-29 20:23:50,506 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - You are not running the flash-attention implementation, expect numerical differences.
+  1%|          | 1/126 [01:13<2:32:24, 73.16s/it]  2%|▏         | 2/126 [02:13<2:15:51, 65.74s/it]  2%|▏         | 3/126 [03:15<2:11:07, 63.96s/it]  3%|▎         | 4/126 [04:17<2:08:13, 63.07s/it]  4%|▍         | 5/126 [05:22<2:08:35, 63.77s/it]  5%|▍         | 6/126 [06:27<2:08:26, 64.22s/it]  6%|▌         | 7/126 [07:31<2:07:19, 64.20s/it]  6%|▋         | 8/126 [08:33<2:04:40, 63.39s/it]  7%|▋         | 9/126 [09:36<2:03:46, 63.47s/it]  8%|▊         | 10/126 [10:46<2:06:30, 65.43s/it]                                                    8%|▊         | 10/126 [10:47<2:06:30, 65.43s/it]  9%|▊         | 11/126 [11:39<1:58:00, 61.57s/it] 10%|▉         | 12/126 [12:48<2:01:32, 63.97s/it] 10%|█         | 13/126 [13:50<1:58:51, 63.11s/it] 11%|█         | 14/126 [14:48<1:55:10, 61.70s/it] 12%|█▏        | 15/126 [15:48<1:53:24, 61.30s/it] 13%|█▎        | 16/126 [16:45<1:49:42, 59.84s/it] 13%|█▎        | 17/126 [17:45<1:48:41, 59.83s/it] 14%|█▍        | 18/126 [18:46<1:48:37, 60.35s/it] 15%|█▌        | 19/126 [19:51<1:50:08, 61.76s/it] 16%|█▌        | 20/126 [20:50<1:47:26, 60.81s/it]                                                   16%|█▌        | 20/126 [20:50<1:47:26, 60.81s/it] 17%|█▋        | 21/126 [21:51<1:46:46, 61.01s/it] 17%|█▋        | 22/126 [22:51<1:45:15, 60.73s/it] 18%|█▊        | 23/126 [23:48<1:42:08, 59.50s/it] 19%|█▉        | 24/126 [24:49<1:41:46, 59.87s/it] 20%|█▉        | 25/126 [25:53<1:43:00, 61.20s/it] 21%|██        | 26/126 [26:56<1:43:02, 61.83s/it] 21%|██▏       | 27/126 [27:56<1:41:02, 61.24s/it] 22%|██▏       | 28/126 [28:54<1:38:16, 60.17s/it] 23%|██▎       | 29/126 [29:54<1:37:11, 60.12s/it] 24%|██▍       | 30/126 [30:55<1:36:47, 60.49s/it]                                                   24%|██▍       | 30/126 [30:55<1:36:47, 60.49s/it] 25%|██▍       | 31/126 [32:00<1:37:42, 61.72s/it] 25%|██▌       | 32/126 [32:57<1:34:22, 60.24s/it] 26%|██▌       | 33/126 [33:53<1:31:25, 58.99s/it] 27%|██▋       | 34/126 [34:50<1:29:53, 58.63s/it] 28%|██▊       | 35/126 [35:48<1:28:28, 58.33s/it] 29%|██▊       | 36/126 [36:45<1:26:39, 57.78s/it] 29%|██▉       | 37/126 [37:45<1:26:55, 58.60s/it] 30%|███       | 38/126 [38:38<1:23:32, 56.96s/it] 31%|███       | 39/126 [39:36<1:22:53, 57.16s/it] 32%|███▏      | 40/126 [40:32<1:21:27, 56.84s/it]                                                   32%|███▏      | 40/126 [40:32<1:21:27, 56.84s/it] 33%|███▎      | 41/126 [41:30<1:21:04, 57.23s/it] 33%|███▎      | 42/126 [42:25<1:19:00, 56.43s/it] 34%|███▍      | 43/126 [43:25<1:19:35, 57.53s/it] 35%|███▍      | 44/126 [44:23<1:19:00, 57.81s/it] 36%|███▌      | 45/126 [45:21<1:17:51, 57.68s/it] 37%|███▋      | 46/126 [46:19<1:17:05, 57.82s/it] 37%|███▋      | 47/126 [47:16<1:16:00, 57.73s/it] 38%|███▊      | 48/126 [48:15<1:15:15, 57.89s/it] 39%|███▉      | 49/126 [49:14<1:14:50, 58.31s/it] 40%|███▉      | 50/126 [50:15<1:14:46, 59.04s/it]                                                   40%|███▉      | 50/126 [50:15<1:14:46, 59.04s/it] 40%|████      | 51/126 [51:06<1:11:05, 56.87s/it] 41%|████▏     | 52/126 [52:03<1:09:56, 56.71s/it] 42%|████▏     | 53/126 [53:03<1:10:29, 57.93s/it] 43%|████▎     | 54/126 [54:02<1:09:39, 58.05s/it] 44%|████▎     | 55/126 [55:01<1:08:59, 58.30s/it] 44%|████▍     | 56/126 [55:56<1:07:08, 57.54s/it] 45%|████▌     | 57/126 [56:59<1:07:52, 59.03s/it] 46%|████▌     | 58/126 [58:01<1:07:59, 59.99s/it] 47%|████▋     | 59/126 [59:02<1:07:16, 60.24s/it] 48%|████▊     | 60/126 [59:53<1:03:16, 57.52s/it]                                                   48%|████▊     | 60/126 [59:53<1:03:16, 57.52s/it] 48%|████▊     | 61/126 [1:00:47<1:01:01, 56.34s/it] 49%|████▉     | 62/126 [1:01:44<1:00:24, 56.63s/it] 50%|█████     | 63/126 [1:02:43<1:00:08, 57.28s/it] 51%|█████     | 64/126 [1:03:50<1:02:23, 60.38s/it] 52%|█████▏    | 65/126 [1:04:57<1:03:12, 62.17s/it] 52%|█████▏    | 66/126 [1:06:03<1:03:21, 63.36s/it] 53%|█████▎    | 67/126 [1:07:09<1:03:04, 64.15s/it] 54%|█████▍    | 68/126 [1:08:11<1:01:28, 63.59s/it] 55%|█████▍    | 69/126 [1:09:15<1:00:35, 63.79s/it] 56%|█████▌    | 70/126 [1:10:15<58:19, 62.50s/it]                                                     56%|█████▌    | 70/126 [1:10:15<58:19, 62.50s/it] 56%|█████▋    | 71/126 [1:11:15<56:33, 61.70s/it] 57%|█████▋    | 72/126 [1:12:16<55:16, 61.41s/it] 58%|█████▊    | 73/126 [1:13:17<54:15, 61.43s/it] 59%|█████▊    | 74/126 [1:14:24<54:33, 62.96s/it] 60%|█████▉    | 75/126 [1:15:27<53:34, 63.03s/it] 60%|██████    | 76/126 [1:16:25<51:23, 61.67s/it] 61%|██████    | 77/126 [1:17:32<51:32, 63.12s/it] 62%|██████▏   | 78/126 [1:18:32<49:50, 62.31s/it] 63%|██████▎   | 79/126 [1:19:32<48:13, 61.57s/it] 63%|██████▎   | 80/126 [1:20:40<48:41, 63.51s/it]                                                   63%|██████▎   | 80/126 [1:20:40<48:41, 63.51s/it] 64%|██████▍   | 81/126 [1:21:49<48:53, 65.20s/it] 65%|██████▌   | 82/126 [1:25:35<1:23:10, 113.43s/it] 66%|██████▌   | 83/126 [1:30:50<2:04:36, 173.88s/it] 67%|██████▋   | 84/126 [1:35:44<2:26:55, 209.89s/it] 67%|██████▋   | 85/126 [1:39:44<2:29:38, 219.00s/it] 68%|██████▊   | 86/126 [1:43:20<2:25:23, 218.09s/it] 69%|██████▉   | 87/126 [1:46:55<2:21:09, 217.16s/it] 70%|██████▉   | 88/126 [1:50:14<2:14:06, 211.74s/it] 71%|███████   | 89/126 [1:53:56<2:12:24, 214.72s/it] 71%|███████▏  | 90/126 [1:59:03<2:25:30, 242.52s/it]                                                      71%|███████▏  | 90/126 [1:59:03<2:25:30, 242.52s/it] 72%|███████▏  | 91/126 [2:04:20<2:34:24, 264.69s/it] 73%|███████▎  | 92/126 [2:09:42<2:39:45, 281.91s/it] 74%|███████▍  | 93/126 [2:15:00<2:41:01, 292.78s/it] 75%|███████▍  | 94/126 [2:18:23<2:21:45, 265.80s/it] 75%|███████▌  | 95/126 [2:22:34<2:15:03, 261.39s/it] 76%|███████▌  | 96/126 [2:27:42<2:17:41, 275.39s/it] 77%|███████▋  | 97/126 [2:32:13<2:12:24, 273.96s/it] 78%|███████▊  | 98/126 [2:35:45<1:59:10, 255.37s/it] 79%|███████▊  | 99/126 [2:39:50<1:53:32, 252.30s/it] 79%|███████▉  | 100/126 [2:43:51<1:47:51, 248.92s/it]                                                       79%|███████▉  | 100/126 [2:43:51<1:47:51, 248.92s/it]/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/peft/utils/save_and_load.py:202: UserWarning: Setting `save_embedding_layers` to `True` as embedding layers found in `target_modules`.
+  warnings.warn("Setting `save_embedding_layers` to `True` as embedding layers found in `target_modules`.")
+ 80%|████████  | 101/126 [2:49:05<1:51:53, 268.52s/it] 81%|████████  | 102/126 [2:53:04<1:43:48, 259.51s/it] 82%|████████▏ | 103/126 [2:58:44<1:48:48, 283.85s/it] 83%|████████▎ | 104/126 [3:04:52<1:53:21, 309.18s/it] 83%|████████▎ | 105/126 [3:12:41<2:04:56, 357.00s/it] 84%|████████▍ | 106/126 [3:21:00<2:13:11, 399.55s/it] 85%|████████▍ | 107/126 [3:26:09<1:57:56, 372.45s/it] 86%|████████▌ | 108/126 [3:30:43<1:42:49, 342.73s/it] 87%|████████▋ | 109/126 [3:35:25<1:31:59, 324.69s/it] 87%|████████▋ | 110/126 [3:41:05<1:27:46, 329.16s/it]                                                       87%|████████▋ | 110/126 [3:41:05<1:27:46, 329.16s/it] 88%|████████▊ | 111/126 [3:47:03<1:24:27, 337.82s/it] 89%|████████▉ | 112/126 [3:53:10<1:20:53, 346.64s/it] 90%|████████▉ | 113/126 [3:59:10<1:15:58, 350.66s/it] 90%|█████████ | 114/126 [4:04:33<1:08:27, 342.26s/it] 91%|█████████▏| 115/126 [4:08:37<57:20, 312.75s/it]   92%|█████████▏| 116/126 [4:12:50<49:09, 294.91s/it] 93%|█████████▎| 117/126 [4:17:08<42:35, 283.92s/it] 94%|█████████▎| 118/126 [4:21:18<36:29, 273.74s/it] 94%|█████████▍| 119/126 [4:27:29<35:19, 302.77s/it] 95%|█████████▌| 120/126 [4:32:44<30:39, 306.51s/it]                                                     95%|█████████▌| 120/126 [4:32:44<30:39, 306.51s/it] 96%|█████████▌| 121/126 [4:38:13<26:06, 313.36s/it] 97%|█████████▋| 122/126 [4:43:13<20:36, 309.18s/it] 98%|█████████▊| 123/126 [4:47:54<15:02, 300.74s/it] 98%|█████████▊| 124/126 [4:52:18<09:39, 289.96s/it] 99%|█████████▉| 125/126 [4:56:30<04:38, 278.56s/it]100%|██████████| 126/126 [5:02:39<00:00, 305.49s/it]/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/peft/utils/save_and_load.py:202: UserWarning: Setting `save_embedding_layers` to `True` as embedding layers found in `target_modules`.
+  warnings.warn("Setting `save_embedding_layers` to `True` as embedding layers found in `target_modules`.")
+                                                    100%|██████████| 126/126 [5:03:44<00:00, 305.49s/it]100%|██████████| 126/126 [5:03:44<00:00, 144.64s/it]
+2025-12-30 01:27:33,745 - agents.trainer - INFO - Saving model to ./models/fine_tuned_20251230_012733
+/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/peft/utils/save_and_load.py:202: UserWarning: Setting `save_embedding_layers` to `True` as embedding layers found in `target_modules`.
+  warnings.warn("Setting `save_embedding_layers` to `True` as embedding layers found in `target_modules`.")
+2025-12-30 01:28:18,896 - agents.trainer - INFO - Model fine-tuned and saved at ./models/fine_tuned_20251230_012733
+2025-12-30 01:28:19,321 - agents.orchestrator - INFO - Model saved at: ./models/fine_tuned_20251230_012733
+2025-12-30 01:28:19,331 - agents.orchestrator - INFO - 
+==================================================
+2025-12-30 01:28:19,332 - agents.orchestrator - INFO - STEP 6: Evaluating the model...
+2025-12-30 01:28:19,332 - agents.orchestrator - INFO - ==================================================
+2025-12-30 01:28:19,358 - agents.evaluator - INFO - Starting model evaluation...
+2025-12-30 01:28:19,361 - agents.evaluator - INFO - Loading model from ./models/fine_tuned_20251230_012733 for evaluation...
+2025-12-30 01:28:30,372 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+{'loss': 39.089, 'grad_norm': 5.256179332733154, 'learning_rate': 9.984326668636131e-05, 'epoch': 0.24}
+{'loss': 37.6827, 'grad_norm': 9.726709365844727, 'learning_rate': 9.708414759071059e-05, 'epoch': 0.47}
+{'loss': 35.4965, 'grad_norm': 13.434455871582031, 'learning_rate': 9.106248208841569e-05, 'epoch': 0.71}
+{'loss': 34.0724, 'grad_norm': 12.38379955291748, 'learning_rate': 8.219552235779578e-05, 'epoch': 0.95}
+{'loss': 34.61, 'grad_norm': 11.388838768005371, 'learning_rate': 7.109767620035689e-05, 'epoch': 1.19}
+{'loss': 33.2149, 'grad_norm': 15.148833274841309, 'learning_rate': 5.853793360434687e-05, 'epoch': 1.42}
+{'loss': 34.3343, 'grad_norm': 13.235299110412598, 'learning_rate': 4.5386582026834906e-05, 'epoch': 1.66}
+{'loss': 32.9737, 'grad_norm': 11.536956787109375, 'learning_rate': 3.379788508244171e-05, 'epoch': 1.9}
+{'loss': 32.9786, 'grad_norm': 13.482122421264648, 'learning_rate': 2.2016041260784605e-05, 'epoch': 2.14}
+{'loss': 33.5616, 'grad_norm': 14.54834270477295, 'learning_rate': 1.2173256946415212e-05, 'epoch': 2.37}
+{'loss': 32.2981, 'grad_norm': 13.627485275268555, 'learning_rate': 4.951556604879048e-06, 'epoch': 2.61}
+{'loss': 32.0122, 'grad_norm': 13.727273941040039, 'learning_rate': 8.513450158049108e-07, 'epoch': 2.85}
+{'train_runtime': 18224.8417, 'train_samples_per_second': 0.111, 'train_steps_per_second': 0.007, 'train_loss': 34.33271934872582, 'epoch': 2.99}
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [02:11<02:11, 131.45s/it]Loading checkpoint shards: 100%|██████████| 2/2 [03:40<00:00, 106.41s/it]Loading checkpoint shards: 100%|██████████| 2/2 [03:40<00:00, 110.17s/it]
+2025-12-30 01:32:43,167 - agents.evaluator - INFO - Calculating perplexity...
+2025-12-30 01:33:27,855 - agents.evaluator - INFO - Perplexity: 9.6674
+2025-12-30 01:33:27,951 - agents.evaluator - INFO - Generating responses for BLEU/ROUGE evaluation...
+The `seen_tokens` attribute is deprecated and will be removed in v4.41. Use the `cache_position` model input instead.
+`get_max_cache()` is deprecated for all Cache classes. Use `get_max_cache_shape()` instead. Calling `get_max_cache()` will raise error from v4.48
+2025-12-30 02:44:32,435 - absl - INFO - Using default tokenizer.
+2025-12-30 02:44:39,334 - agents.evaluator - INFO - BLEU: 0.0159, ROUGE-L: 0.1608
+2025-12-30 02:44:39,347 - agents.evaluator - INFO - Evaluation complete: {'perplexity': 9.667401432265482, 'bleu': 0.01586662586089274, 'rouge': 0.16076325864121987, 'num_samples': 10}
+2025-12-30 02:44:39,500 - agents.orchestrator - INFO - Evaluation metrics: {'perplexity': 9.667401432265482, 'bleu': 0.01586662586089274, 'rouge': 0.16076325864121987, 'num_samples': 10}
+2025-12-30 02:44:39,508 - agents.orchestrator - INFO - 
+==================================================
+2025-12-30 02:44:39,509 - agents.orchestrator - INFO - STEP 7: Checking for self-improvement...
+2025-12-30 02:44:39,509 - agents.orchestrator - INFO - ==================================================
+2025-12-30 02:44:39,509 - agents.orchestrator - INFO - Performance degradation detected. Triggering self-improvement...
+2025-12-30 02:44:39,518 - agents.self_improvement - INFO - Running hyperparameter optimization...
+[I 2025-12-30 02:44:39,536] A new study created in memory with name: no-name-853b939a-c2c4-48a6-a45a-fbb69cf7e38e
+2025-12-30 02:44:45,483 - agents.self_improvement - INFO - Best hyperparameters found: {'learning_rate': 4.3284502212938785e-05, 'batch_size': 4, 'training_epochs': 4, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.011852604486622221, 'gradient_accumulation_steps': 8}
+2025-12-30 02:44:45,492 - agents.self_improvement - INFO - Suggested config improvements: {'learning_rate': 4.3284502212938785e-05, 'batch_size': 4, 'training_epochs': 4, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.011852604486622221, 'gradient_accumulation_steps': 8}
+2025-12-30 02:44:45,497 - agents.orchestrator - INFO - Config updated: {'base_model': 'microsoft/Phi-3-mini-4k-instruct', 'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2', 'quantization': '4bit', 'data_dir': './data', 'model_dir': './models', 'logs_dir': './logs', 'vector_db_path': './vector_store', 'arxiv_keywords': ['large language models', 'LLM fine-tuning', 'transformer architecture', 'natural language processing', 'parameter efficient fine-tuning', 'LoRA', 'QLoRA', 'instruction tuning', 'retrieval augmented generation', 'attention mechanism', 'BERT', 'GPT', 'prompt engineering', 'chain of thought', 'in-context learning', 'language model pretraining', 'neural machine translation', 'text generation', 'question answering', 'knowledge distillation'], 'min_papers_threshold': 5, 'gpu_memory_limit': '12GB', 'training_epochs': 4, 'batch_size': 4, 'learning_rate': 4.3284502212938785e-05, 'gradient_accumulation_steps': 8, 'warmup_ratio': 0.05, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.011852604486622221, 'lora_target_modules': ['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj', 'lm_head'], 'max_context_length': 512, 'max_new_tokens': 1024, 'retrieval_top_k': 7, 'temperature': 0.7, 'top_p': 0.9, 'perplexity_threshold': 0.85, 'eval_sample_size': 100}
+2025-12-30 02:44:45,522 - agents.orchestrator - INFO - Cycle results saved to ./logs/cycle_20251230_024445.json
+2025-12-30 02:44:45,525 - agents.orchestrator - INFO - 
+==================================================
+2025-12-30 02:44:45,526 - agents.orchestrator - INFO - PIPELINE COMPLETED SUCCESSFULLY!
+2025-12-30 02:44:45,527 - agents.orchestrator - INFO - ==================================================
+2025-12-30 02:44:45,795 - __main__ - INFO - Pipeline completed successfully!

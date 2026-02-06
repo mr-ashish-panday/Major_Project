@@ -1,0 +1,339 @@
+2026-01-04 17:34:01,299 - __main__ - INFO - ============================================================
+2026-01-04 17:34:01,303 - __main__ - INFO - 🚀 CONTINUOUS TRAINING - Run #21
+2026-01-04 17:34:01,303 - __main__ - INFO -    arXiv offset: 2550
+2026-01-04 17:34:01,303 - __main__ - INFO -    Log file: training21.log
+2026-01-04 17:34:01,304 - __main__ - INFO - ============================================================
+2026-01-04 17:34:01,304 - agents.orchestrator - INFO - ==================================================
+2026-01-04 17:34:01,304 - agents.orchestrator - INFO - Initializing ScholarMind Agents...
+2026-01-04 17:34:01,304 - agents.orchestrator - INFO - ==================================================
+2026-01-04 17:34:01,304 - agents.orchestrator - INFO - Initializing ExtractorAgent...
+2026-01-04 17:34:01,308 - agents.orchestrator - INFO - Initializing PreprocessorAgent...
+2026-01-04 17:34:05,647 - agents.orchestrator - INFO - Initializing ValidatorAgent...
+2026-01-04 17:34:05,653 - agents.validator - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2026-01-04 17:34:05,676 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2026-01-04 17:34:05,679 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2026-01-04 17:34:12,307 - agents.validator - INFO - Loaded 289 historical embeddings.
+2026-01-04 17:34:12,308 - agents.orchestrator - INFO - Initializing VectorStoreAgent...
+2026-01-04 17:34:12,308 - agents.vector_store - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2026-01-04 17:34:12,309 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2026-01-04 17:34:12,309 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2026-01-04 17:34:20,682 - agents.vector_store - INFO - Loaded existing index with 7588 documents.
+2026-01-04 17:34:20,690 - agents.vector_store - INFO - VectorStoreAgent initialized. Index has 7588 documents.
+2026-01-04 17:34:20,691 - agents.orchestrator - INFO - Initializing TrainerAgent...
+2026-01-04 17:34:20,692 - agents.trainer - INFO - Loading base model for training...
+2026-01-04 17:34:24,183 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2026-01-04 17:35:53,751 - agents.trainer - INFO - Trainable parameters: 75,800,576 / 2,084,940,800 (3.64%)
+2026-01-04 17:35:53,761 - agents.orchestrator - INFO - Initializing EvaluatorAgent...
+2026-01-04 17:36:01,000 - agents.orchestrator - INFO - Initializing SelfImprovementAgent...
+2026-01-04 17:36:01,003 - agents.self_improvement - INFO - Loaded 7 historical improvement records.
+2026-01-04 17:36:01,004 - agents.orchestrator - INFO - All agents initialized successfully!
+2026-01-04 17:36:01,004 - agents.orchestrator - INFO - 
+==================================================
+2026-01-04 17:36:01,004 - agents.orchestrator - INFO - STEP 1: Extracting papers from arXiv...
+2026-01-04 17:36:01,004 - agents.orchestrator - INFO - ==================================================
+2026-01-04 17:36:01,004 - agents.extractor - INFO - Fetching 150 papers starting from offset 2550
+2026-01-04 17:36:01,005 - arxiv - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=0&max_results=50
+2026-01-04 17:36:01,809 - arxiv - INFO - Got first page: 50 of 2368028 total results
+2026-01-04 17:36:01,837 - arxiv - INFO - Sleeping: 2.726830 seconds
+2026-01-04 17:36:04,582 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=50&max_results=50
+2026-01-04 17:36:05,129 - arxiv - INFO - Sleeping: 2.636226 seconds
+2026-01-04 17:36:07,769 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=100&max_results=50
+2026-01-04 17:36:08,160 - arxiv - INFO - Sleeping: 2.730215 seconds
+2026-01-04 17:36:10,895 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=150&max_results=50
+2026-01-04 17:36:11,343 - arxiv - INFO - Sleeping: 2.682924 seconds
+2026-01-04 17:36:14,031 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=200&max_results=50
+2026-01-04 17:36:14,364 - arxiv - INFO - Sleeping: 2.761183 seconds
+2026-01-04 17:36:17,129 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=250&max_results=50
+2026-01-04 17:36:17,345 - arxiv - INFO - Sleeping: 2.880138 seconds
+2026-01-04 17:36:20,231 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=300&max_results=50
+2026-01-04 17:36:20,781 - arxiv - INFO - Sleeping: 2.585715 seconds
+2026-01-04 17:36:23,371 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=350&max_results=50
+2026-01-04 17:36:23,580 - arxiv - INFO - Sleeping: 2.873038 seconds
+2026-01-04 17:36:26,458 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=50
+2026-01-04 17:36:26,820 - arxiv - INFO - Sleeping: 2.748302 seconds
+2026-01-04 17:36:29,572 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=450&max_results=50
+2026-01-04 17:36:29,907 - arxiv - INFO - Sleeping: 2.770965 seconds
+2026-01-04 17:36:32,684 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=500&max_results=50
+2026-01-04 17:36:33,158 - arxiv - INFO - Sleeping: 2.637946 seconds
+2026-01-04 17:36:35,802 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=550&max_results=50
+2026-01-04 17:36:36,272 - arxiv - INFO - Sleeping: 2.656713 seconds
+2026-01-04 17:36:38,939 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=600&max_results=50
+2026-01-04 17:36:39,330 - arxiv - INFO - Sleeping: 2.743544 seconds
+2026-01-04 17:36:42,080 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=650&max_results=50
+2026-01-04 17:36:42,468 - arxiv - INFO - Sleeping: 2.733668 seconds
+2026-01-04 17:36:45,206 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=700&max_results=50
+2026-01-04 17:36:45,624 - arxiv - INFO - Sleeping: 2.686492 seconds
+2026-01-04 17:36:48,316 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=750&max_results=50
+2026-01-04 17:36:48,743 - arxiv - INFO - Sleeping: 2.680979 seconds
+2026-01-04 17:36:51,432 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=800&max_results=50
+2026-01-04 17:36:51,765 - arxiv - INFO - Sleeping: 2.778455 seconds
+2026-01-04 17:36:54,591 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=850&max_results=50
+2026-01-04 17:36:55,035 - arxiv - INFO - Sleeping: 2.736855 seconds
+2026-01-04 17:36:57,779 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=900&max_results=50
+2026-01-04 17:36:58,345 - arxiv - INFO - Sleeping: 2.568456 seconds
+2026-01-04 17:37:00,957 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=950&max_results=50
+2026-01-04 17:37:01,579 - arxiv - INFO - Sleeping: 2.652223 seconds
+2026-01-04 17:37:04,248 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1000&max_results=50
+2026-01-04 17:37:04,525 - arxiv - INFO - Sleeping: 2.825218 seconds
+2026-01-04 17:37:07,355 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1050&max_results=50
+2026-01-04 17:37:07,671 - arxiv - INFO - Sleeping: 2.776446 seconds
+2026-01-04 17:37:10,457 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1100&max_results=50
+2026-01-04 17:37:10,943 - arxiv - INFO - Sleeping: 2.622075 seconds
+2026-01-04 17:37:13,575 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1150&max_results=50
+2026-01-04 17:37:13,932 - arxiv - INFO - Sleeping: 2.753482 seconds
+2026-01-04 17:37:16,690 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1200&max_results=50
+2026-01-04 17:37:17,076 - arxiv - INFO - Sleeping: 2.721955 seconds
+2026-01-04 17:37:19,805 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1250&max_results=50
+2026-01-04 17:37:20,173 - arxiv - INFO - Sleeping: 2.777950 seconds
+2026-01-04 17:37:22,959 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1300&max_results=50
+2026-01-04 17:37:23,339 - arxiv - INFO - Sleeping: 2.724291 seconds
+2026-01-04 17:37:26,066 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1350&max_results=50
+2026-01-04 17:37:26,469 - arxiv - INFO - Sleeping: 2.677527 seconds
+2026-01-04 17:37:29,148 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1400&max_results=50
+2026-01-04 17:37:36,047 - arxiv - INFO - Sleeping: 2.401467 seconds
+2026-01-04 17:37:38,455 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1450&max_results=50
+2026-01-04 17:37:38,706 - arxiv - INFO - Sleeping: 2.835536 seconds
+2026-01-04 17:37:41,544 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1500&max_results=50
+2026-01-04 17:37:41,766 - arxiv - INFO - Sleeping: 2.890409 seconds
+2026-01-04 17:37:44,660 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1550&max_results=50
+2026-01-04 17:37:45,068 - arxiv - INFO - Sleeping: 2.742116 seconds
+2026-01-04 17:37:47,817 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1600&max_results=50
+2026-01-04 17:37:48,235 - arxiv - INFO - Sleeping: 2.733013 seconds
+2026-01-04 17:37:50,975 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1650&max_results=50
+2026-01-04 17:37:51,408 - arxiv - INFO - Sleeping: 2.700429 seconds
+2026-01-04 17:37:54,111 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1700&max_results=50
+2026-01-04 17:37:54,496 - arxiv - INFO - Sleeping: 2.700301 seconds
+2026-01-04 17:37:57,197 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1750&max_results=50
+2026-01-04 17:37:57,636 - arxiv - INFO - Sleeping: 2.648033 seconds
+2026-01-04 17:38:00,286 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1800&max_results=50
+2026-01-04 17:38:00,591 - arxiv - INFO - Sleeping: 2.824387 seconds
+2026-01-04 17:38:03,420 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1850&max_results=50
+2026-01-04 17:38:03,789 - arxiv - INFO - Sleeping: 2.740218 seconds
+2026-01-04 17:38:06,566 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1900&max_results=50
+2026-01-04 17:38:06,913 - arxiv - INFO - Sleeping: 2.774534 seconds
+2026-01-04 17:38:09,696 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=1950&max_results=50
+2026-01-04 17:38:10,022 - arxiv - INFO - Sleeping: 2.776286 seconds
+2026-01-04 17:38:12,805 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2000&max_results=50
+2026-01-04 17:38:13,182 - arxiv - INFO - Sleeping: 2.742265 seconds
+2026-01-04 17:38:15,932 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2050&max_results=50
+2026-01-04 17:38:16,332 - arxiv - INFO - Sleeping: 2.735212 seconds
+2026-01-04 17:38:19,073 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2100&max_results=50
+2026-01-04 17:38:25,704 - arxiv - INFO - Sleeping: 2.669778 seconds
+2026-01-04 17:38:28,375 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2150&max_results=50
+2026-01-04 17:38:35,791 - arxiv - INFO - Sleeping: 2.856980 seconds
+2026-01-04 17:38:38,651 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2200&max_results=50
+2026-01-04 17:38:44,652 - arxiv - INFO - Sleeping: 2.716063 seconds
+2026-01-04 17:38:47,372 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2250&max_results=50
+2026-01-04 17:38:47,685 - arxiv - INFO - Sleeping: 2.786668 seconds
+2026-01-04 17:38:50,477 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2300&max_results=50
+2026-01-04 17:38:50,926 - arxiv - INFO - Sleeping: 2.646919 seconds
+2026-01-04 17:38:53,577 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2350&max_results=50
+2026-01-04 17:38:53,963 - arxiv - INFO - Sleeping: 2.746283 seconds
+2026-01-04 17:38:56,714 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2400&max_results=50
+2026-01-04 17:38:57,028 - arxiv - INFO - Sleeping: 2.785844 seconds
+2026-01-04 17:38:59,820 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2450&max_results=50
+2026-01-04 17:39:00,236 - arxiv - INFO - Sleeping: 2.697500 seconds
+2026-01-04 17:39:02,940 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2500&max_results=50
+2026-01-04 17:39:03,280 - arxiv - INFO - Sleeping: 2.773604 seconds
+2026-01-04 17:39:06,059 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2550&max_results=50
+2026-01-04 17:42:43,471 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2600&max_results=50
+2026-01-04 17:46:21,793 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=2650&max_results=50
+2026-01-04 17:48:11,655 - agents.extractor - INFO - Extracted 150 papers.
+2026-01-04 17:48:11,697 - agents.orchestrator - INFO - Extracted 150 papers
+2026-01-04 17:48:11,698 - agents.orchestrator - INFO - 
+==================================================
+2026-01-04 17:48:11,698 - agents.orchestrator - INFO - STEP 2: Preprocessing papers...
+2026-01-04 17:48:11,698 - agents.orchestrator - INFO - ==================================================
+2026-01-04 17:48:12,974 - agents.preprocessor - INFO - Preprocessed: Dihadron Transverse-Spin Asymmetries in Muon-Deute... (21 chunks)
+2026-01-04 17:48:14,133 - agents.preprocessor - INFO - Preprocessed: An alternative characterisation of graphs quasi-is... (42 chunks)
+2026-01-04 17:48:14,712 - agents.preprocessor - INFO - Preprocessed: Revealing the Partially Coherent Nature of Transpo... (21 chunks)
+2026-01-04 17:48:15,424 - agents.preprocessor - INFO - Preprocessed: Data relativistic uncertainty framework for low-il... (22 chunks)
+2026-01-04 17:48:17,371 - agents.preprocessor - INFO - Preprocessed: Completing the enumeration of inversion sequences ... (57 chunks)
+2026-01-04 17:48:18,590 - agents.preprocessor - INFO - Preprocessed: Multi-reference Trial State for Lattice Quantum Mo... (33 chunks)
+2026-01-04 17:48:18,912 - agents.preprocessor - INFO - Preprocessed: A Light Weight Neural Network for Automatic Modula... (9 chunks)
+2026-01-04 17:48:19,177 - agents.preprocessor - INFO - Preprocessed: Interaction-Induced Spiral Motion and Breathing Dy... (20 chunks)
+2026-01-04 17:48:19,603 - agents.preprocessor - INFO - Preprocessed: MoFu: Scale-Aware Modulation and Fourier Fusion fo... (17 chunks)
+2026-01-04 17:48:20,582 - agents.preprocessor - INFO - Preprocessed: Optimal Convergence Estimate of the Limit from Inv... (64 chunks)
+2026-01-04 17:48:21,874 - agents.preprocessor - INFO - Preprocessed: Integrating Low-Altitude SAR Imaging into UAV Data... (36 chunks)
+2026-01-04 17:48:22,522 - agents.preprocessor - INFO - Preprocessed: Acylindricity in Higher Rank, Part I : Fundamental... (2 chunks)
+2026-01-04 17:48:22,787 - agents.preprocessor - INFO - Preprocessed: Benign Nonconvexity of Synchronization Landscape I... (2 chunks)
+2026-01-04 17:48:23,133 - agents.preprocessor - INFO - Preprocessed: Double-Layered Silica-Engineered Fluorescent Nanod... (20 chunks)
+2026-01-04 17:48:23,440 - agents.preprocessor - INFO - Preprocessed: Broken Words, Broken Performance: Effect of Tokeni... (14 chunks)
+2026-01-04 17:48:23,701 - agents.preprocessor - INFO - Preprocessed: Volumes of foliations birationally bounded by alge... (1 chunks)
+2026-01-04 17:48:26,118 - agents.preprocessor - INFO - Preprocessed: Multipolar fluctuations from localized 4f electron... (56 chunks)
+2026-01-04 17:48:27,048 - agents.preprocessor - INFO - Preprocessed: Zeeman-like coupling to valley degree of freedom i... (47 chunks)
+2026-01-04 17:48:28,203 - agents.preprocessor - INFO - Preprocessed: Impact of the sodium and calcium chlorides uptake ... (28 chunks)
+2026-01-04 17:48:29,102 - agents.preprocessor - INFO - Preprocessed: beta plane corrections to nonlinear atmospheric fl... (32 chunks)
+2026-01-04 17:48:29,685 - agents.preprocessor - INFO - Preprocessed: A large, long-lived, slowly-expanding superbubble ... (19 chunks)
+2026-01-04 17:48:30,254 - agents.preprocessor - INFO - Preprocessed: Arbitrary Reflectionless Optical Routing via Non-H... (19 chunks)
+2026-01-04 17:48:31,484 - agents.preprocessor - INFO - Preprocessed: Hybrid Combinatorial Multi-armed Bandits with Prob... (23 chunks)
+2026-01-04 17:48:33,162 - agents.preprocessor - INFO - Preprocessed: Unsupervised Anomaly Detection in Brain MRI via Di... (70 chunks)
+2026-01-04 17:48:34,422 - agents.preprocessor - INFO - Preprocessed: Determining Blockchain Transaction Timing and Fee ... (32 chunks)
+2026-01-04 17:48:35,097 - agents.preprocessor - INFO - Preprocessed: Poincaré Duality and Multiplicative Structures on ... (3 chunks)
+2026-01-04 17:48:35,682 - agents.preprocessor - INFO - Preprocessed: AutoPP: Towards Automated Product Poster Generatio... (19 chunks)
+2026-01-04 17:48:36,420 - agents.preprocessor - INFO - Preprocessed: SWE-RM: Execution-free Feedback For Software Engin... (23 chunks)
+2026-01-04 17:48:37,500 - agents.preprocessor - INFO - Preprocessed: Semiparametric Preference Optimization: Your Langu... (42 chunks)
+2026-01-04 17:48:38,279 - agents.preprocessor - INFO - Preprocessed: Patch as Node: Human-Centric Graph Representation ... (23 chunks)
+2026-01-04 17:48:39,537 - agents.preprocessor - INFO - Preprocessed: Exploring the Heterogeneity of Tabular Data: A Div... (43 chunks)
+2026-01-04 17:48:40,159 - agents.preprocessor - INFO - Preprocessed: Logical Consistency as a Dynamical Invariant: A Qu... (19 chunks)
+2026-01-04 17:48:40,388 - agents.preprocessor - INFO - Preprocessed: GQ-VAE: A gated quantized VAE for learning variabl... (9 chunks)
+2026-01-04 17:48:40,684 - agents.preprocessor - INFO - Preprocessed: Enhancing Microwave Heating Uniformity in Cavities... (10 chunks)
+2026-01-04 17:48:41,305 - agents.preprocessor - INFO - Preprocessed: Accelerate Speculative Decoding with Sparse Comput... (20 chunks)
+2026-01-04 17:48:42,134 - agents.preprocessor - INFO - Preprocessed: A novel implementation of CCSD analytic gradients ... (25 chunks)
+2026-01-04 17:48:42,865 - agents.preprocessor - INFO - Preprocessed: Permutation Polynomials of the form $L(X)+γTr_q^{q... (30 chunks)
+2026-01-04 17:48:43,548 - agents.preprocessor - INFO - Preprocessed: SpatialBench: Can Agents Analyze Real-World Spatia... (23 chunks)
+2026-01-04 17:48:44,854 - agents.preprocessor - INFO - Preprocessed: Wave propagation for 1-dimensional reaction-diffus... (91 chunks)
+2026-01-04 17:48:45,428 - agents.preprocessor - INFO - Preprocessed: High-Fidelity and Long-Duration Human Image Animat... (16 chunks)
+2026-01-04 17:48:46,080 - agents.preprocessor - INFO - Preprocessed: Fano Fibrations and Twisted Kähler-Einstein Metric... (28 chunks)
+2026-01-04 17:48:47,757 - agents.preprocessor - INFO - Preprocessed: Explainable Statute Prediction via Attention-based... (44 chunks)
+2026-01-04 17:48:48,564 - agents.preprocessor - INFO - Preprocessed: Graph Drawing Stress Model with Resistance Distanc... (29 chunks)
+2026-01-04 17:48:53,214 - agents.preprocessor - INFO - Preprocessed: Nucleon momentum distributions of complex nuclei f... (26 chunks)
+2026-01-04 17:48:54,762 - agents.preprocessor - INFO - Preprocessed: The First X-ray Polarimetry of GRS 1739--278 Revea... (29 chunks)
+2026-01-04 17:48:55,661 - agents.preprocessor - INFO - Preprocessed: LLMBoost: Make Large Language Models Stronger with... (28 chunks)
+2026-01-04 17:48:56,373 - agents.preprocessor - INFO - Preprocessed: Flexible Multitask Learning with Factorized Diffus... (28 chunks)
+2026-01-04 17:48:56,778 - agents.preprocessor - INFO - Preprocessed: MMCTOP: A Multimodal Textualization and Mixture-of... (37 chunks)
+2026-01-04 17:48:57,484 - agents.preprocessor - INFO - Preprocessed: First-Order Logic and Twin-Width for Some Geometri... (52 chunks)
+2026-01-04 17:48:58,760 - agents.preprocessor - INFO - Preprocessed: Drug discovery guided by maximum drug likeness... (26 chunks)
+2026-01-04 17:48:59,214 - agents.preprocessor - INFO - Preprocessed: Rare Word Recognition and Translation Without Fine... (13 chunks)
+2026-01-04 17:48:59,692 - agents.preprocessor - INFO - Preprocessed: Evaluating Supervised Learning Approaches for Quan... (13 chunks)
+2026-01-04 17:49:01,646 - agents.preprocessor - INFO - Preprocessed: CrownGen: Patient-customized Crown Generation via ... (46 chunks)
+2026-01-04 17:49:02,849 - agents.preprocessor - INFO - Preprocessed: Long-term monitoring of repeating FRB 20220912A wi... (33 chunks)
+2026-01-04 17:49:03,618 - agents.preprocessor - INFO - Preprocessed: Implications of Cosmic Birefringence for Multi-Fie... (19 chunks)
+2026-01-04 17:49:04,466 - agents.preprocessor - INFO - Preprocessed: Aerial World Model for Long-horizon Visual Generat... (18 chunks)
+2026-01-04 17:49:05,440 - agents.preprocessor - INFO - Preprocessed: Online Inertia Parameter Estimation for Unknown Ob... (20 chunks)
+2026-01-04 17:49:06,678 - agents.preprocessor - INFO - Preprocessed: Spectral State Switching in Mrk 421: Results from ... (34 chunks)
+2026-01-04 17:49:08,943 - agents.preprocessor - INFO - Preprocessed: Optimizing Resource Allocation for Geographically-... (63 chunks)
+2026-01-04 17:49:09,436 - agents.preprocessor - INFO - Preprocessed: Reloc-VGGT: Visual Re-localization with Geometry G... (23 chunks)
+2026-01-04 17:49:10,091 - agents.preprocessor - INFO - Preprocessed: Optimal Trajectory Planning for Orbital Robot Rend... (17 chunks)
+2026-01-04 17:49:10,885 - agents.preprocessor - INFO - Preprocessed: SLIM-Brain: A Data- and Training-Efficient Foundat... (22 chunks)
+2026-01-04 17:49:12,420 - agents.preprocessor - INFO - Preprocessed: Creation of domain-wall skyrmions in chiral magnet... (48 chunks)
+2026-01-04 17:49:12,798 - agents.preprocessor - INFO - Preprocessed: A Communication-Efficient Distributed Algorithm fo... (23 chunks)
+2026-01-04 17:49:13,052 - agents.preprocessor - INFO - Preprocessed: MASFIN: A Multi-Agent System for Decomposed Financ... (8 chunks)
+2026-01-04 17:49:13,532 - agents.preprocessor - INFO - Preprocessed: CricBench: A Multilingual Benchmark for Evaluating... (17 chunks)
+2026-01-04 17:49:14,557 - agents.preprocessor - INFO - Preprocessed: LLA: Enhancing Security and Privacy for Generative... (21 chunks)
+2026-01-04 17:49:14,986 - agents.preprocessor - INFO - Preprocessed: Beyond Single Bugs: Benchmarking Large Language Mo... (20 chunks)
+2026-01-04 17:49:16,458 - agents.preprocessor - INFO - Preprocessed: PDx -- Adaptive Credit Risk Forecasting Model in D... (47 chunks)
+2026-01-04 17:49:17,514 - agents.preprocessor - INFO - Preprocessed: Electrically induced ferromagnetism in an irradiat... (14 chunks)
+2026-01-04 17:49:19,418 - agents.preprocessor - INFO - Preprocessed: Magic State Distillation using Asymptotically Good... (48 chunks)
+2026-01-04 17:49:19,662 - agents.preprocessor - INFO - Preprocessed: Qualitative properties of positive solutions to mi... (2 chunks)
+2026-01-04 17:49:20,071 - agents.preprocessor - INFO - Preprocessed: Compact Ca II K Brightenings Precede Solar Flares:... (28 chunks)
+2026-01-04 17:49:21,387 - agents.preprocessor - INFO - Preprocessed: Nascent biofilms on soft surfaces... (31 chunks)
+2026-01-04 17:49:22,647 - agents.preprocessor - INFO - Preprocessed: Bridging the Copyright Gap: Do Large Vision-Langua... (29 chunks)
+2026-01-04 17:49:24,034 - agents.preprocessor - INFO - Preprocessed: Theoretical perspectives on charge dynamics in hig... (45 chunks)
+2026-01-04 17:49:27,776 - agents.preprocessor - INFO - Preprocessed: Beyond on-site Hubbard interaction in charge dynam... (102 chunks)
+2026-01-04 17:49:28,382 - agents.preprocessor - INFO - Preprocessed: DPAR: Dynamic Patchification for Efficient Autoreg... (22 chunks)
+2026-01-04 17:49:28,936 - agents.preprocessor - INFO - Preprocessed: Secure and Explainable Fraud Detection in Finance ... (21 chunks)
+2026-01-04 17:49:29,879 - agents.preprocessor - INFO - Preprocessed: EasyOmnimatte: Taming Pretrained Inpainting Diffus... (17 chunks)
+2026-01-04 17:49:30,348 - agents.preprocessor - INFO - Preprocessed: The trinacria graphs $T_{(b+2)b2}$ are $e$-positiv... (1 chunks)
+2026-01-04 17:49:31,450 - agents.preprocessor - INFO - Preprocessed: Frozen LVLMs for Micro-Video Recommendation: A Sys... (27 chunks)
+2026-01-04 17:49:31,675 - agents.preprocessor - INFO - Preprocessed: Balancing Accuracy and Efficiency: CNN Fusion Mode... (14 chunks)
+2026-01-04 17:49:33,681 - agents.preprocessor - INFO - Preprocessed: Training-free Conditional Image Embedding Framewor... (21 chunks)
+2026-01-04 17:49:33,995 - agents.preprocessor - INFO - Preprocessed: PortionNet: Distilling 3D Geometric Knowledge for ... (10 chunks)
+2026-01-04 17:49:35,091 - agents.preprocessor - INFO - Preprocessed: TimeBill: Time-Budgeted Inference for Large Langua... (21 chunks)
+2026-01-04 17:49:37,745 - agents.preprocessor - INFO - Preprocessed: Professor Hideki Yukawa's Anguish and a Lifelong D... (231 chunks)
+2026-01-04 17:49:38,547 - agents.preprocessor - INFO - Preprocessed: Fast Inference of Visual Autoregressive Model with... (24 chunks)
+2026-01-04 17:49:38,819 - agents.preprocessor - INFO - Preprocessed: Breaking Alignment Barriers: TPS-Driven Semantic C... (23 chunks)
+2026-01-04 17:49:39,663 - agents.preprocessor - INFO - Preprocessed: Ergotropy in Quantum Batteries... (46 chunks)
+2026-01-04 17:49:40,788 - agents.preprocessor - INFO - Preprocessed: Necking of epithelial tissues with cellular topolo... (41 chunks)
+2026-01-04 17:49:42,772 - agents.preprocessor - INFO - Preprocessed: MoonBot: Modular and On-Demand Reconfigurable Robo... (53 chunks)
+2026-01-04 17:49:43,491 - agents.preprocessor - INFO - Preprocessed: A Comedy of Estimators: On KL Regularization in RL... (34 chunks)
+2026-01-04 17:49:43,950 - agents.preprocessor - INFO - Preprocessed: Programmable Photonic Circuits with Embedded Feedb... (18 chunks)
+2026-01-04 17:49:44,551 - agents.preprocessor - INFO - Preprocessed: Attack-Aware Deepfake Detection under Counter-Fore... (26 chunks)
+2026-01-04 17:49:45,177 - agents.preprocessor - INFO - Preprocessed: HeartBench: Probing Core Dimensions of Anthropomor... (21 chunks)
+2026-01-04 17:49:45,839 - agents.preprocessor - INFO - Preprocessed: A General Framework for Constructing Local Hidden-... (23 chunks)
+2026-01-04 17:49:48,955 - agents.preprocessor - INFO - Preprocessed: Quantum Breakdown Condensate as a Disorder-Free Qu... (41 chunks)
+2026-01-04 17:49:49,455 - agents.preprocessor - INFO - Preprocessed: Comprehensive study of solar type II radio bursts ... (20 chunks)
+2026-01-04 17:49:49,618 - agents.preprocessor - INFO - Preprocessed: Statistical and Machine Learning Analysis of Traff... (18 chunks)
+2026-01-04 17:49:50,315 - agents.preprocessor - INFO - Preprocessed: Scalable Class-Incremental Learning Based on Param... (36 chunks)
+2026-01-04 17:49:52,052 - agents.preprocessor - INFO - Preprocessed: A Cohomological Framework for Topological Phases f... (75 chunks)
+2026-01-04 17:49:52,893 - agents.preprocessor - INFO - Preprocessed: The Loring--Schulz-Baldes Spectral Localizer Revis... (36 chunks)
+2026-01-04 17:49:53,180 - agents.preprocessor - INFO - Preprocessed: A Statistical Side-Channel Risk Model for Timing V... (21 chunks)
+2026-01-04 17:49:53,351 - agents.preprocessor - INFO - Preprocessed: AlignAR: Generative Sentence Alignment for Arabic-... (12 chunks)
+2026-01-04 17:49:53,638 - agents.preprocessor - INFO - Preprocessed: Evaluation of Turbulence Models and Boundary Condi... (17 chunks)
+2026-01-04 17:49:56,947 - agents.preprocessor - INFO - Preprocessed: Large-time asymptotics for the defocusing Manakov ... (146 chunks)
+2026-01-04 17:49:57,878 - agents.preprocessor - INFO - Preprocessed: Targeted learning via probabilistic subpopulation ... (31 chunks)
+2026-01-04 17:49:58,427 - agents.preprocessor - INFO - Preprocessed: Fano compactifications of mutation algebras... (1 chunks)
+2026-01-04 17:49:59,459 - agents.preprocessor - INFO - Preprocessed: Experimental study on the wall-pressure fluctuatio... (45 chunks)
+2026-01-04 17:49:59,934 - agents.preprocessor - INFO - Preprocessed: Weighted $L_p$-Discrepancy Bounds for Parametric S... (15 chunks)
+2026-01-04 17:50:00,356 - agents.preprocessor - INFO - Preprocessed: Knowledge Reasoning of Large Language Models Integ... (12 chunks)
+2026-01-04 17:50:00,824 - agents.preprocessor - INFO - Preprocessed: Spectroscopic Characterization of Metallocene Sing... (13 chunks)
+2026-01-04 17:50:02,190 - agents.preprocessor - INFO - Preprocessed: LIME:Accelerating Collaborative Lossless LLM Infer... (38 chunks)
+2026-01-04 17:50:02,422 - agents.preprocessor - INFO - Preprocessed: Conserved active information... (19 chunks)
+2026-01-04 17:50:02,917 - agents.preprocessor - INFO - Preprocessed: Universal thermodynamic framework for quasi-van de... (41 chunks)
+2026-01-04 17:50:03,514 - agents.preprocessor - INFO - Preprocessed: Hybrid-Code: A Privacy-Preserving, Redundant Multi... (25 chunks)
+2026-01-04 17:50:04,890 - agents.preprocessor - INFO - Preprocessed: Beyond Content: How Author Network Centrality Driv... (45 chunks)
+2026-01-04 17:50:06,082 - agents.preprocessor - INFO - Preprocessed: End-to-End 3D Spatiotemporal Perception with Multi... (31 chunks)
+2026-01-04 17:50:06,867 - agents.preprocessor - INFO - Preprocessed: Physics-informed Neural Network (PINN) to Predict ... (14 chunks)
+2026-01-04 17:50:09,136 - agents.preprocessor - INFO - Preprocessed: Tilt Matching for Scalable Sampling and Fine-Tunin... (36 chunks)
+2026-01-04 17:50:09,616 - agents.preprocessor - INFO - Preprocessed: Contextual Biasing for LLM-Based ASR with Hotword ... (10 chunks)
+2026-01-04 17:50:11,446 - agents.preprocessor - INFO - Preprocessed: Securing Cross-Domain Internet of Drones: An RFF-P... (39 chunks)
+2026-01-04 17:50:12,465 - agents.preprocessor - INFO - Preprocessed: Surrogate-Powered Inference: Regularization and Ad... (24 chunks)
+2026-01-04 17:50:12,948 - agents.preprocessor - INFO - Preprocessed: AgenticTCAD: A LLM-based Multi-Agent Framework for... (14 chunks)
+2026-01-04 17:50:13,234 - agents.preprocessor - INFO - Preprocessed: Investigating Conditional Restricted Boltzmann Mac... (17 chunks)
+2026-01-04 17:50:13,752 - agents.preprocessor - INFO - Preprocessed: Toward Generalizable Surrogate Models for Molecula... (26 chunks)
+2026-01-04 17:50:15,625 - agents.preprocessor - INFO - Preprocessed: Optimal-Transport Stability of Inverse Point-Sourc... (65 chunks)
+2026-01-04 17:50:16,163 - agents.preprocessor - INFO - Preprocessed: Batched Training for QLSTM vs. QFWP: A System-Orie... (14 chunks)
+2026-01-04 17:50:16,825 - agents.preprocessor - INFO - Preprocessed: Q-A3C2: Quantum Reinforcement Learning with Time-S... (11 chunks)
+2026-01-04 17:50:17,403 - agents.preprocessor - INFO - Preprocessed: Analyzing Code Injection Attacks on LLM-based Mult... (17 chunks)
+2026-01-04 17:50:18,484 - agents.preprocessor - INFO - Preprocessed: Method Decoration (DeMe): A Framework for LLM-Driv... (26 chunks)
+2026-01-04 17:50:20,439 - agents.preprocessor - INFO - Preprocessed: Delayed Choice Lorentz Transformations on a Qubit... (61 chunks)
+2026-01-04 17:50:22,706 - agents.preprocessor - INFO - Preprocessed: Few Tokens Matter: Entropy Guided Attacks on Visio... (45 chunks)
+2026-01-04 17:50:23,455 - agents.preprocessor - INFO - Preprocessed: Stability for the inverse random potential scatter... (40 chunks)
+2026-01-04 17:50:23,993 - agents.preprocessor - INFO - Preprocessed: Real-Time In-Cabin Driver Behavior Recognition on ... (18 chunks)
+2026-01-04 17:50:24,723 - agents.preprocessor - INFO - Preprocessed: Organizational Learning in Industry 4.0: Applying ... (15 chunks)
+2026-01-04 17:50:26,505 - agents.preprocessor - INFO - Preprocessed: Sparsification of sums with respect to convex cone... (60 chunks)
+2026-01-04 17:50:27,217 - agents.preprocessor - INFO - Preprocessed: A Story About Cohesion and Separation: Label-Free ... (38 chunks)
+2026-01-04 17:50:28,107 - agents.preprocessor - INFO - Preprocessed: Temperature- and Pressure-Dependent Vibrational Pr... (15 chunks)
+2026-01-04 17:50:29,390 - agents.preprocessor - INFO - Preprocessed: On The Conceptualization and Societal Impact of Cr... (19 chunks)
+2026-01-04 17:50:33,342 - agents.preprocessor - INFO - Preprocessed: Unitary and Nonunitary A-D-E minimal models: Coset... (114 chunks)
+2026-01-04 17:50:34,333 - agents.preprocessor - INFO - Preprocessed: Low-SWaP Magneto-optical Trap using both Planar Op... (45 chunks)
+2026-01-04 17:50:34,840 - agents.preprocessor - INFO - Preprocessed: Optimal Robust Bounded Bias and Bounded Variance D... (12 chunks)
+2026-01-04 17:50:35,298 - agents.preprocessor - INFO - Preprocessed: Regge theory in hadron physics... (1 chunks)
+2026-01-04 17:50:35,785 - agents.preprocessor - INFO - Preprocessed: S&P 500 Stock's Movement Prediction using CNN... (11 chunks)
+2026-01-04 17:50:36,330 - agents.preprocessor - INFO - Preprocessed: CellMamba: Adaptive Mamba for Accurate and Efficie... (17 chunks)
+2026-01-04 17:50:36,616 - agents.preprocessor - INFO - Preprocessed: Smart IoT-Based Leak Forecasting and Detection for... (13 chunks)
+2026-01-04 17:50:37,030 - agents.preprocessor - INFO - Preprocessed: Chromatic numbers from edge ideals: Graph classes ... (27 chunks)
+2026-01-04 17:50:37,320 - agents.preprocessor - INFO - Preprocessed: KG20C & KG20C-QA: Scholarly Knowledge Graph Benchm... (14 chunks)
+2026-01-04 17:50:37,324 - agents.preprocessor - INFO - Preprocessed 150 out of 150 papers
+2026-01-04 17:50:37,325 - agents.orchestrator - INFO - Preprocessed 150 papers
+2026-01-04 17:50:37,326 - agents.orchestrator - INFO - 
+==================================================
+2026-01-04 17:50:37,326 - agents.orchestrator - INFO - STEP 3: Validating papers...
+2026-01-04 17:50:37,326 - agents.orchestrator - INFO - ==================================================
+2026-01-04 17:50:37,358 - agents.validator - INFO - Discarded (low relevance): Dihadron Transverse-Spin Asymmetries in Muon-Deute...
+2026-01-04 17:50:37,414 - agents.validator - INFO - Discarded (low relevance): An alternative characterisation of graphs quasi-is...
+2026-01-04 17:50:37,454 - agents.validator - INFO - Discarded (low relevance): Revealing the Partially Coherent Nature of Transpo...
+2026-01-04 17:50:37,479 - agents.validator - INFO - Discarded (low relevance): Data relativistic uncertainty framework for low-il...
+2026-01-04 17:50:37,524 - agents.validator - INFO - Discarded (low relevance): Completing the enumeration of inversion sequences ...
+2026-01-04 17:50:37,551 - agents.validator - INFO - Discarded (low relevance): Multi-reference Trial State for Lattice Quantum Mo...
+2026-01-04 17:50:37,563 - agents.validator - INFO - Discarded (low relevance): A Light Weight Neural Network for Automatic Modula...
+2026-01-04 17:50:37,576 - agents.validator - INFO - Discarded (low relevance): Interaction-Induced Spiral Motion and Breathing Dy...
+2026-01-04 17:50:37,588 - agents.validator - INFO - Discarded (low relevance): MoFu: Scale-Aware Modulation and Fourier Fusion fo...
+2026-01-04 17:50:37,623 - agents.validator - INFO - Discarded (low relevance): Optimal Convergence Estimate of the Limit from Inv...
+2026-01-04 17:50:37,658 - agents.validator - INFO - Discarded (low relevance): Integrating Low-Altitude SAR Imaging into UAV Data...
+2026-01-04 17:50:37,661 - agents.validator - INFO - Discarded (low relevance): Acylindricity in Higher Rank, Part I : Fundamental...
+2026-01-04 17:50:37,662 - agents.validator - INFO - Discarded (low relevance): Benign Nonconvexity of Synchronization Landscape I...
+2026-01-04 17:50:37,679 - agents.validator - INFO - Discarded (low relevance): Double-Layered Silica-Engineered Fluorescent Nanod...
+2026-01-04 17:50:37,975 - agents.orchestrator - ERROR - Orchestration failed: expected mat1 and mat2 to have the same dtype, but got: c10::Half != float
+2026-01-04 17:50:37,981 - agents.orchestrator - ERROR - Full traceback:
+Traceback (most recent call last):
+  File "/home/ashish/Major_Project/agents/orchestrator.py", line 107, in orchestrate
+    validated = self.validator.validate(processed)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/Major_Project/agents/validator.py", line 161, in validate
+    if not self._check_duplicate(paper):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/Major_Project/agents/validator.py", line 89, in _check_duplicate
+    similarity = util.cos_sim(paper_embedding, hist_emb)[0][0].item()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/sentence_transformers/util.py", line 97, in cos_sim
+    return torch.mm(a_norm, b_norm.transpose(0, 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: expected mat1 and mat2 to have the same dtype, but got: c10::Half != float
+
+2026-01-04 17:50:37,999 - __main__ - WARNING - ⚠️  Full pipeline failed (likely arXiv rate limit)
+2026-01-04 17:50:38,000 - __main__ - INFO - 🔄 Falling back to training on existing data...
+2026-01-04 17:51:04,532 - __main__ - INFO - ✅ Fallback training completed!
+2026-01-04 17:51:05,134 - __main__ - INFO - 📈 State updated:
+2026-01-04 17:51:05,152 - __main__ - INFO -    Next arXiv offset: 2700
+2026-01-04 17:51:05,159 - __main__ - INFO -    Next log file: training22.log

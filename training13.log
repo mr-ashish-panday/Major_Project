@@ -1,0 +1,120 @@
+2026-01-01 13:03:44,263 - datasets - INFO - PyTorch version 2.3.1+cu118 available.
+2026-01-01 13:03:48,151 - faiss.loader - INFO - Loading faiss.
+2026-01-01 13:03:48,195 - faiss.loader - INFO - Successfully loaded faiss.
+2026-01-01 13:03:48,445 - __main__ - INFO - ============================================================
+2026-01-01 13:03:48,446 - __main__ - INFO - 🚀 CONTINUOUS TRAINING - Run #13
+2026-01-01 13:03:48,446 - __main__ - INFO -    arXiv offset: 1350
+2026-01-01 13:03:48,446 - __main__ - INFO -    Log file: training13.log
+2026-01-01 13:03:48,446 - __main__ - INFO - ============================================================
+2026-01-01 13:03:48,446 - agents.orchestrator - INFO - ==================================================
+2026-01-01 13:03:48,446 - agents.orchestrator - INFO - Initializing ScholarMind Agents...
+2026-01-01 13:03:48,446 - agents.orchestrator - INFO - ==================================================
+2026-01-01 13:03:48,446 - agents.orchestrator - INFO - Initializing ExtractorAgent...
+2026-01-01 13:03:48,447 - agents.orchestrator - INFO - Initializing PreprocessorAgent...
+2026-01-01 13:03:49,354 - agents.orchestrator - INFO - Initializing ValidatorAgent...
+2026-01-01 13:03:49,355 - agents.validator - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2026-01-01 13:03:49,383 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2026-01-01 13:03:49,384 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2026-01-01 13:03:54,867 - agents.validator - INFO - Loaded 232 historical embeddings.
+2026-01-01 13:03:54,868 - agents.orchestrator - INFO - Initializing VectorStoreAgent...
+2026-01-01 13:03:54,868 - agents.vector_store - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2026-01-01 13:03:54,868 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2026-01-01 13:03:54,868 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2026-01-01 13:03:59,497 - agents.vector_store - INFO - Loaded existing index with 6195 documents.
+2026-01-01 13:03:59,497 - agents.vector_store - INFO - VectorStoreAgent initialized. Index has 6195 documents.
+2026-01-01 13:03:59,498 - agents.orchestrator - INFO - Initializing TrainerAgent...
+2026-01-01 13:03:59,498 - agents.trainer - INFO - Loading base model for training...
+2026-01-01 13:04:00,778 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - `flash-attention` package not found, consider installing for better performance: No module named 'flash_attn'.
+2026-01-01 13:04:00,779 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - Current `flash-attention` does not support `window_size`. Either upgrade or use `attn_implementation='eager'`.
+2026-01-01 13:04:04,473 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2026-01-01 13:04:35,358 - agents.trainer - INFO - Trainable parameters: 18,950,144 / 2,028,090,368 (0.93%)
+2026-01-01 13:04:35,358 - agents.orchestrator - INFO - Initializing EvaluatorAgent...
+2026-01-01 13:04:41,360 - agents.orchestrator - INFO - Initializing SelfImprovementAgent...
+2026-01-01 13:04:41,361 - agents.self_improvement - INFO - Loaded 4 historical improvement records.
+2026-01-01 13:04:41,361 - agents.orchestrator - INFO - All agents initialized successfully!
+2026-01-01 13:04:41,361 - agents.orchestrator - INFO - 
+==================================================
+2026-01-01 13:04:41,361 - agents.orchestrator - INFO - STEP 1: Extracting papers from arXiv...
+2026-01-01 13:04:41,362 - agents.orchestrator - INFO - ==================================================
+2026-01-01 13:04:41,362 - agents.extractor - INFO - Fetching 150 papers starting from offset 1350
+2026-01-01 13:04:41,362 - arxiv - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=0&max_results=100
+2026-01-01 13:04:42,163 - arxiv - INFO - Got first page: 100 of 2368028 total results
+2026-01-01 13:04:42,174 - arxiv - INFO - Sleeping: 2.767321 seconds
+2026-01-01 13:04:44,942 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=100&max_results=100
+2026-01-01 13:04:45,465 - arxiv - INFO - Sleeping: 2.602610 seconds
+2026-01-01 13:04:48,070 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=200&max_results=100
+2026-01-01 13:04:48,470 - arxiv - INFO - Sleeping: 2.778908 seconds
+2026-01-01 13:04:51,250 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=300&max_results=100
+2026-01-01 13:04:51,606 - arxiv - INFO - Sleeping: 2.803946 seconds
+2026-01-01 13:04:54,411 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100
+2026-01-01 13:05:26,923 - arxiv - INFO - Sleeping: 2.999906 seconds
+2026-01-01 13:05:29,925 - arxiv - INFO - Requesting page (first: False, try: 1): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100
+2026-01-01 13:06:01,518 - arxiv - INFO - Sleeping: 2.999687 seconds
+2026-01-01 13:06:04,520 - arxiv - INFO - Requesting page (first: False, try: 2): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100
+2026-01-01 13:06:36,018 - arxiv - INFO - Sleeping: 2.999919 seconds
+2026-01-01 13:06:39,018 - arxiv - INFO - Requesting page (first: False, try: 3): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100
+2026-01-01 13:07:10,503 - agents.orchestrator - ERROR - Orchestration failed: Page request resulted in HTTP 500 (https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100)
+2026-01-01 13:07:10,534 - agents.orchestrator - ERROR - Full traceback:
+Traceback (most recent call last):
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 648, in _parse_feed
+    return self.__try_parse_feed(url, first_page=first_page, try_index=_try_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 685, in __try_parse_feed
+    raise HTTPError(url, try_index, resp.status_code)
+arxiv.HTTPError: Page request resulted in HTTP 500 (https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 648, in _parse_feed
+    return self.__try_parse_feed(url, first_page=first_page, try_index=_try_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 685, in __try_parse_feed
+    raise HTTPError(url, try_index, resp.status_code)
+arxiv.HTTPError: Page request resulted in HTTP 500 (https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 648, in _parse_feed
+    return self.__try_parse_feed(url, first_page=first_page, try_index=_try_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 685, in __try_parse_feed
+    raise HTTPError(url, try_index, resp.status_code)
+arxiv.HTTPError: Page request resulted in HTTP 500 (https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ashish/Major_Project/agents/orchestrator.py", line 81, in orchestrate
+    papers = self.extractor.extract()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/Major_Project/agents/extractor.py", line 29, in extract
+    for result in self.arxiv_client.results(search):
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 622, in _results
+    feed = self._parse_feed(page_url, first_page=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 656, in _parse_feed
+    return self._parse_feed(url, first_page=first_page, _try_index=_try_index + 1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 656, in _parse_feed
+    return self._parse_feed(url, first_page=first_page, _try_index=_try_index + 1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 656, in _parse_feed
+    return self._parse_feed(url, first_page=first_page, _try_index=_try_index + 1)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 658, in _parse_feed
+    raise err
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 648, in _parse_feed
+    return self.__try_parse_feed(url, first_page=first_page, try_index=_try_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ashish/paper11_code_execution_failures/venv/lib/python3.12/site-packages/arxiv/__init__.py", line 685, in __try_parse_feed
+    raise HTTPError(url, try_index, resp.status_code)
+arxiv.HTTPError: Page request resulted in HTTP 500 (https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=400&max_results=100)
+
+2026-01-01 13:07:10,537 - __main__ - WARNING - ⚠️  Full pipeline failed (likely arXiv rate limit)
+2026-01-01 13:07:10,538 - __main__ - INFO - 🔄 Falling back to training on existing data...
+2026-01-01 13:07:22,975 - __main__ - INFO - ✅ Fallback training completed!
+2026-01-01 13:07:22,978 - __main__ - INFO - 📈 State updated:
+2026-01-01 13:07:22,978 - __main__ - INFO -    Next arXiv offset: 1500
+2026-01-01 13:07:22,979 - __main__ - INFO -    Next log file: training14.log

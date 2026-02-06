@@ -1,0 +1,9 @@
+nohup: ignoring input
+2025-12-31 14:01:14,846 - INFO - ============================================================
+2025-12-31 14:01:14,848 - INFO - 🔄 Resume Training - Completing Run #4 from checkpoint-300
+2025-12-31 14:01:14,852 - INFO - ============================================================
+2025-12-31 14:01:14,853 - ERROR - Checkpoint not found: ./models/checkpoint-300
+2025-12-31 14:01:14,854 - ERROR - Available checkpoints:
+2025-12-31 14:01:14,855 - ERROR -   - checkpoint-1000
+2025-12-31 14:01:14,856 - ERROR -   - checkpoint-1661
+2025-12-31 14:01:14,857 - ERROR -   - checkpoint-1500

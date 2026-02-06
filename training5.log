@@ -1,0 +1,48 @@
+nohup: ignoring input
+2025-12-31 11:09:29,857 - __main__ - INFO - ============================================================
+2025-12-31 11:09:29,858 - __main__ - INFO - 🧠 ScholarMind - Self-Evolving LLM Research Assistant
+2025-12-31 11:09:29,858 - __main__ - INFO - ============================================================
+2025-12-31 11:09:29,858 - __main__ - INFO - HuggingFace token found.
+2025-12-31 11:09:30,132 - __main__ - INFO - GPU available: NVIDIA GeForce RTX 3080 Ti (12.6 GB)
+2025-12-31 11:09:30,132 - agents.orchestrator - INFO - ==================================================
+2025-12-31 11:09:30,133 - agents.orchestrator - INFO - Initializing ScholarMind Agents...
+2025-12-31 11:09:30,133 - agents.orchestrator - INFO - ==================================================
+2025-12-31 11:09:30,133 - agents.orchestrator - INFO - Initializing ExtractorAgent...
+2025-12-31 11:09:30,133 - agents.orchestrator - INFO - Initializing PreprocessorAgent...
+2025-12-31 11:09:31,056 - agents.orchestrator - INFO - Initializing ValidatorAgent...
+2025-12-31 11:09:31,056 - agents.validator - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-12-31 11:09:31,056 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2025-12-31 11:09:31,056 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-12-31 11:09:36,269 - agents.validator - INFO - Loaded 122 historical embeddings.
+2025-12-31 11:09:36,270 - agents.orchestrator - INFO - Initializing VectorStoreAgent...
+2025-12-31 11:09:36,270 - agents.vector_store - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-12-31 11:09:36,270 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2025-12-31 11:09:36,270 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-12-31 11:09:39,953 - agents.vector_store - INFO - Loaded existing index with 3404 documents.
+2025-12-31 11:09:39,953 - agents.vector_store - INFO - VectorStoreAgent initialized. Index has 3404 documents.
+2025-12-31 11:09:39,953 - agents.orchestrator - INFO - Initializing TrainerAgent...
+2025-12-31 11:09:39,953 - agents.trainer - INFO - Loading base model for training...
+2025-12-31 11:09:41,204 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - `flash-attention` package not found, consider installing for better performance: No module named 'flash_attn'.
+2025-12-31 11:09:41,204 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - Current `flash-attention` does not support `window_size`. Either upgrade or use `attn_implementation='eager'`.
+2025-12-31 11:09:42,642 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:30<00:30, 30.39s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:45<00:00, 21.58s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:45<00:00, 22.90s/it]
+2025-12-31 11:10:30,004 - agents.trainer - INFO - Trainable parameters: 18,950,144 / 2,028,090,368 (0.93%)
+2025-12-31 11:10:30,004 - agents.orchestrator - INFO - Initializing EvaluatorAgent...
+2025-12-31 11:10:36,296 - agents.orchestrator - INFO - Initializing SelfImprovementAgent...
+2025-12-31 11:10:36,301 - agents.self_improvement - INFO - Loaded 2 historical improvement records.
+2025-12-31 11:10:36,301 - agents.orchestrator - INFO - All agents initialized successfully!
+2025-12-31 11:10:36,301 - agents.orchestrator - INFO - 
+==================================================
+2025-12-31 11:10:36,301 - agents.orchestrator - INFO - STEP 1: Extracting papers from arXiv...
+2025-12-31 11:10:36,301 - agents.orchestrator - INFO - ==================================================
+2025-12-31 11:10:36,301 - agents.extractor - INFO - Fetching 300 papers starting from offset 200
+2025-12-31 11:10:36,301 - arxiv - INFO - Requesting page (first: True, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=0&max_results=100
+2025-12-31 11:11:08,120 - arxiv - INFO - Sleeping: 2.999874 seconds
+2025-12-31 11:11:11,121 - arxiv - INFO - Requesting page (first: True, try: 1): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=0&max_results=100
+2025-12-31 11:11:42,499 - arxiv - INFO - Sleeping: 2.999903 seconds
+2025-12-31 11:11:45,499 - arxiv - INFO - Requesting page (first: True, try: 2): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=0&max_results=100
+2025-12-31 11:11:54,543 - arxiv - INFO - Got first page: 100 of 2366825 total results
+2025-12-31 11:11:54,548 - arxiv - INFO - Sleeping: 2.864554 seconds
+2025-12-31 11:11:57,414 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=100&max_results=100
+2025-12-31 11:12:08,129 - arxiv - INFO - Sleeping: 2.884810 seconds
+2025-12-31 11:12:11,015 - arxiv - INFO - Requesting page (first: False, try: 0): https://export.arxiv.org/api/query?search_query=large+language+models+OR+LLM+fine-tuning+OR+transformer+architecture+OR+natural+language+processing+OR+parameter+efficient+fine-tuning+OR+LoRA+OR+QLoRA+OR+instruction+tuning+OR+retrieval+augmented+generation+OR+attention+mechanism+OR+BERT+OR+GPT+OR+prompt+engineering+OR+chain+of+thought+OR+in-context+learning+OR+language+model+pretraining+OR+neural+machine+translation+OR+text+generation+OR+question+answering+OR+knowledge+distillation&id_list=&sortBy=submittedDate&sortOrder=descending&start=200&max_results=100

@@ -1,0 +1,17 @@
+2025-12-23 00:06:36,419 - __main__ - INFO - ============================================================
+2025-12-23 00:06:36,419 - __main__ - INFO - 🧠 ScholarMind - Self-Evolving LLM Research Assistant
+2025-12-23 00:06:36,419 - __main__ - INFO - ============================================================
+2025-12-23 00:06:36,419 - __main__ - INFO - HuggingFace token found.
+2025-12-23 00:06:36,454 - __main__ - INFO - GPU available: NVIDIA GeForce RTX 3080 Ti (12.6 GB)
+2025-12-23 00:06:36,454 - agents.orchestrator - INFO - ==================================================
+2025-12-23 00:06:36,454 - agents.orchestrator - INFO - Initializing ScholarMind Agents...
+2025-12-23 00:06:36,454 - agents.orchestrator - INFO - ==================================================
+2025-12-23 00:06:36,455 - agents.orchestrator - INFO - Initializing ExtractorAgent...
+2025-12-23 00:06:36,455 - agents.orchestrator - INFO - Initializing PreprocessorAgent...
+2025-12-23 00:06:36,751 - agents.preprocessor - WARNING - Could not load tokenizer for microsoft/Phi-3-mini-4k-instruct: microsoft/Phi-3-mini-4k-instruct is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'
+If this is a private repository, make sure to pass a token having permission to this repo either by logging in with `huggingface-cli login` or by passing `token=<your_token>`
+2025-12-23 00:06:37,482 - agents.orchestrator - INFO - Initializing ValidatorAgent...
+2025-12-23 00:06:37,482 - agents.validator - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-12-23 00:06:37,482 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2025-12-23 00:06:37,482 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-12-23 00:06:37,726 - sentence_transformers.SentenceTransformer - WARNING - No sentence-transformers model found with name sentence-transformers/all-MiniLM-L6-v2. Creating a new one with mean pooling.

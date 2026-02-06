@@ -1,0 +1,25 @@
+2025-12-23 01:46:24,470 - __main__ - INFO - ============================================================
+2025-12-23 01:46:24,471 - __main__ - INFO - 🧠 ScholarMind - Self-Evolving LLM Research Assistant
+2025-12-23 01:46:24,471 - __main__ - INFO - ============================================================
+2025-12-23 01:46:24,471 - __main__ - INFO - HuggingFace token found.
+2025-12-23 01:46:24,564 - __main__ - INFO - GPU available: NVIDIA GeForce RTX 3080 Ti (12.6 GB)
+2025-12-23 01:46:24,565 - agents.orchestrator - INFO - ==================================================
+2025-12-23 01:46:24,565 - agents.orchestrator - INFO - Initializing ScholarMind Agents...
+2025-12-23 01:46:24,565 - agents.orchestrator - INFO - ==================================================
+2025-12-23 01:46:24,565 - agents.orchestrator - INFO - Initializing ExtractorAgent...
+2025-12-23 01:46:24,566 - agents.orchestrator - INFO - Initializing PreprocessorAgent...
+2025-12-23 01:46:26,072 - agents.orchestrator - INFO - Initializing ValidatorAgent...
+2025-12-23 01:46:26,076 - agents.validator - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-12-23 01:46:26,080 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2025-12-23 01:46:26,080 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-12-23 01:46:34,398 - agents.orchestrator - INFO - Initializing VectorStoreAgent...
+2025-12-23 01:46:34,402 - agents.vector_store - INFO - Loading embedding model: sentence-transformers/all-MiniLM-L6-v2
+2025-12-23 01:46:34,404 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda
+2025-12-23 01:46:34,404 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2025-12-23 01:46:38,857 - agents.vector_store - INFO - Created new FAISS index with dimension 384
+2025-12-23 01:46:38,857 - agents.vector_store - INFO - VectorStoreAgent initialized. Index has 0 documents.
+2025-12-23 01:46:38,857 - agents.orchestrator - INFO - Initializing TrainerAgent...
+2025-12-23 01:46:38,857 - agents.trainer - INFO - Loading base model for training...
+2025-12-23 01:46:39,992 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - `flash-attention` package not found, consider installing for better performance: No module named 'flash_attn'.
+2025-12-23 01:46:39,993 - transformers_modules.microsoft.Phi-3-mini-4k-instruct.f39ac1d28e925b323eae81227eaba4464caced4e.modeling_phi3 - WARNING - Current `flash-attention` does not support `window_size`. Either upgrade or use `attn_implementation='eager'`.
+2025-12-23 01:46:41,562 - accelerate.utils.modeling - INFO - We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
