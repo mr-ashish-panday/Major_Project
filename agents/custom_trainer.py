@@ -78,23 +78,35 @@ class WikiTextDataset(Dataset):
         # Get the raw tokenizer handle
         tok = tokenizer.tokenizer if hasattr(tokenizer, 'tokenizer') else tokenizer
         
-        # Filter out short/empty lines
+        # Filter out short/empty lines, cap at 500K for speed
+        # 500K lines ≈ 60M tokens, more than enough for 122M param model
+        MAX_LINES = 500_000
         lines = [t for t in dataset['text'] if len(t.strip()) > 10]
-        logger.info(f"Tokenizing {len(lines):,} lines in batches...")
+        if len(lines) > MAX_LINES:
+            logger.info(f"Capping dataset from {len(lines):,} to {MAX_LINES:,} lines")
+            lines = lines[:MAX_LINES]
         
-        # Tokenize in batches of 1000 lines to avoid OOM
+        logger.info(f"Tokenizing {len(lines):,} lines using fast batch mode...")
+        
+        # Tokenize in batches using list-of-strings (Rust fast tokenizer)
         all_token_ids = []
-        batch_size = 1000
+        batch_size = 5000  # Large batches for fast tokenizer parallelism
+        
         for i in range(0, len(lines), batch_size):
             batch = lines[i:i + batch_size]
-            batch_text = "\n".join(batch)
-            encoded = tok(batch_text, truncation=False, return_attention_mask=False)
-            all_token_ids.extend(encoded['input_ids'])
+            # Pass list of strings → fast tokenizer uses Rust parallelism
+            encoded = tok(batch, truncation=False, return_attention_mask=False,
+                         add_special_tokens=False)
             
-            if (i // batch_size) % 50 == 0:
-                logger.info(f"  Tokenized {min(i + batch_size, len(lines)):,}/{len(lines):,} lines "
+            for ids in encoded['input_ids']:
+                all_token_ids.extend(ids)
+            
+            progress = min(i + batch_size, len(lines))
+            if (i // batch_size) % 10 == 0:
+                logger.info(f"  Tokenized {progress:,}/{len(lines):,} lines "
                            f"({len(all_token_ids):,} tokens so far)")
         
+        logger.info(f"Tokenization complete: {len(all_token_ids):,} total tokens")
         all_tokens = torch.tensor(all_token_ids, dtype=torch.long)
         
         # Create fixed-length chunks (non-overlapping)
@@ -102,7 +114,7 @@ class WikiTextDataset(Dataset):
         all_tokens = all_tokens[:num_chunks * max_length]
         self.chunks = all_tokens.view(num_chunks, max_length)
         
-        logger.info(f"WikiText-103 loaded: {len(all_tokens):,} tokens → "
+        logger.info(f"WikiText-103 ready: {len(all_tokens):,} tokens → "
                      f"{num_chunks:,} chunks of {max_length} tokens")
     
     def __len__(self):
