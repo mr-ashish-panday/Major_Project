@@ -31,7 +31,8 @@ from typing import Dict, List, Optional, Tuple
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
-from torch.cuda.amp import GradScaler, autocast
+from torch.cuda.amp import GradScaler
+from torch.cuda.amp import autocast as cuda_autocast
 
 from scholarformer.config import ScholarFormerConfig
 from scholarformer.model import ScholarFormerModel
@@ -416,7 +417,7 @@ class CustomTrainerAgent:
                 num_tokens = (labels != -100).sum().item()
                 
                 # Forward pass with mixed precision
-                with autocast(device_type='cuda', dtype=torch.float16):
+                with cuda_autocast(dtype=torch.float16):
                     outputs = self.model(
                         input_ids,
                         section_ids=section_ids,

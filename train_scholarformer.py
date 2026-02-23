@@ -90,11 +90,15 @@ def print_banner(text: str):
 
 
 def load_validated_papers():
-    """Load preprocessed papers from the existing pipeline's data directory."""
+    """Load papers from the existing pipeline's data directory.
+    
+    Checks for preprocessed JSON first. If not found, extracts text
+    directly from PDFs using PyMuPDF.
+    """
     data_dir = CONFIG['data_dir']
     papers = []
 
-    # Look for preprocessed JSON files
+    # 1. Check for preprocessed JSON files
     processed_dir = os.path.join(data_dir, 'processed')
     if os.path.exists(processed_dir):
         for f in os.listdir(processed_dir):
@@ -106,25 +110,69 @@ def load_validated_papers():
                 except Exception:
                     continue
 
-    # Also check for a single combined file
+    # 2. Check for a single combined file
     combined_path = os.path.join(data_dir, 'validated_papers.json')
     if os.path.exists(combined_path) and not papers:
         with open(combined_path, 'r', encoding='utf-8') as f:
             papers = json.load(f)
 
-    # Fallback: look for any .json in data_dir
+    # 3. Fallback: extract text from PDFs using PyMuPDF
     if not papers:
-        for f in os.listdir(data_dir):
-            if f.endswith('.json') and 'paper' in f.lower():
-                try:
-                    with open(os.path.join(data_dir, f), 'r', encoding='utf-8') as fh:
-                        data = json.load(fh)
-                        if isinstance(data, list):
-                            papers.extend(data)
-                        elif isinstance(data, dict):
-                            papers.append(data)
-                except Exception:
+        logger.info("No preprocessed JSON found — extracting text from PDFs...")
+        try:
+            import fitz  # PyMuPDF
+        except ImportError:
+            logger.error("PyMuPDF not installed! Run: pip install pymupdf")
+            return []
+        
+        pdf_files = sorted([f for f in os.listdir(data_dir) if f.endswith('.pdf')])
+        logger.info(f"Found {len(pdf_files)} PDFs in {data_dir}")
+        
+        for i, pdf_file in enumerate(pdf_files):
+            try:
+                pdf_path = os.path.join(data_dir, pdf_file)
+                doc = fitz.open(pdf_path)
+                
+                # Extract text from all pages
+                full_text = ""
+                for page in doc:
+                    full_text += page.get_text() + "\n"
+                doc.close()
+                
+                if len(full_text.strip()) < 200:
                     continue
+                
+                # Split into chunks of ~500 words
+                words = full_text.split()
+                chunk_size = 500
+                chunks = []
+                for j in range(0, len(words), chunk_size):
+                    chunk_text = " ".join(words[j:j + chunk_size])
+                    if len(chunk_text.strip()) > 100:
+                        chunks.append(chunk_text)
+                
+                paper = {
+                    'metadata': {
+                        'title': pdf_file.replace('.pdf', ''),
+                        'source': pdf_path,
+                    },
+                    'chunks': chunks,
+                }
+                papers.append(paper)
+                
+                if (i + 1) % 100 == 0:
+                    logger.info(f"  Extracted {i + 1}/{len(pdf_files)} PDFs...")
+                    
+            except Exception as e:
+                logger.warning(f"  Failed to extract {pdf_file}: {e}")
+                continue
+        
+        # Save extracted papers for future runs
+        if papers:
+            save_path = os.path.join(data_dir, 'validated_papers.json')
+            with open(save_path, 'w', encoding='utf-8') as f:
+                json.dump(papers, f, ensure_ascii=False)
+            logger.info(f"Saved {len(papers)} extracted papers to {save_path}")
 
     logger.info(f"Loaded {len(papers)} papers for fine-tuning")
     return papers

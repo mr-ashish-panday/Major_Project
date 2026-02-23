@@ -407,7 +407,7 @@ class DistillationAgent:
                 input_ids = batch['input_ids'].to(self.device)
                 labels = batch['labels'].to(self.device)
                 
-                with torch.cuda.amp.autocast(dtype=torch.float16):
+                with torch.cuda.amp.autocast():
                     outputs = self.student(input_ids, labels=labels)
                     loss = outputs['loss']
                 
