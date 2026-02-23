@@ -75,18 +75,27 @@ class WikiTextDataset(Dataset):
                 cache_dir='./data/wikitext_cache'
             )
         
-        # Concatenate all text and tokenize
-        logger.info("Tokenizing WikiText-103...")
-        all_text = "\n".join([t for t in dataset['text'] if len(t.strip()) > 10])
+        # Get the raw tokenizer handle
+        tok = tokenizer.tokenizer if hasattr(tokenizer, 'tokenizer') else tokenizer
         
-        # Tokenize the full text
-        if hasattr(tokenizer, 'tokenizer'):
-            # ScholarFormerTokenizer wrapper
-            encoded = tokenizer.tokenizer(all_text, return_tensors='pt', truncation=False)
-        else:
-            encoded = tokenizer(all_text, return_tensors='pt', truncation=False)
+        # Filter out short/empty lines
+        lines = [t for t in dataset['text'] if len(t.strip()) > 10]
+        logger.info(f"Tokenizing {len(lines):,} lines in batches...")
         
-        all_tokens = encoded['input_ids'].squeeze(0)
+        # Tokenize in batches of 1000 lines to avoid OOM
+        all_token_ids = []
+        batch_size = 1000
+        for i in range(0, len(lines), batch_size):
+            batch = lines[i:i + batch_size]
+            batch_text = "\n".join(batch)
+            encoded = tok(batch_text, truncation=False, return_attention_mask=False)
+            all_token_ids.extend(encoded['input_ids'])
+            
+            if (i // batch_size) % 50 == 0:
+                logger.info(f"  Tokenized {min(i + batch_size, len(lines)):,}/{len(lines):,} lines "
+                           f"({len(all_token_ids):,} tokens so far)")
+        
+        all_tokens = torch.tensor(all_token_ids, dtype=torch.long)
         
         # Create fixed-length chunks (non-overlapping)
         num_chunks = len(all_tokens) // max_length
