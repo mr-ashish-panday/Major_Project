@@ -20,6 +20,10 @@ Requirements:
 
 import os
 import sys
+
+# MUST be set before importing transformers/tokenizers to prevent fork deadlock
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 import json
 import time
 import logging
