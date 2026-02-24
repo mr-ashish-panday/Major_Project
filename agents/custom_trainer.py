@@ -61,6 +61,18 @@ class WikiTextDataset(Dataset):
         self.max_length = max_length
         self.tokenizer = tokenizer
         
+        # Check for cached tokenized chunks first
+        cache_dir = './data/wikitext_cache'
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_path = os.path.join(cache_dir, f'wikitext103_chunks_{max_length}.pt')
+        
+        if os.path.exists(cache_path):
+            logger.info(f"Loading cached tokenized chunks from {cache_path}...")
+            self.chunks = torch.load(cache_path, weights_only=True)
+            logger.info(f"Loaded {len(self.chunks):,} cached chunks of {max_length} tokens "
+                         f"({len(self.chunks) * max_length:,} total tokens)")
+            return
+        
         logger.info(f"Loading WikiText-103 ({split} split)...")
         
         # Try loading from HuggingFace datasets
@@ -73,7 +85,7 @@ class WikiTextDataset(Dataset):
             from datasets import load_dataset
             dataset = load_dataset(
                 'wikitext', 'wikitext-103-raw-v1', split=split,
-                cache_dir='./data/wikitext_cache'
+                cache_dir=cache_dir
             )
         
         # Get the raw tokenizer handle
@@ -114,6 +126,10 @@ class WikiTextDataset(Dataset):
         num_chunks = len(all_tokens) // max_length
         all_tokens = all_tokens[:num_chunks * max_length]
         self.chunks = all_tokens.view(num_chunks, max_length)
+        
+        # Cache to disk for future runs
+        torch.save(self.chunks, cache_path)
+        logger.info(f"Cached {num_chunks:,} chunks to {cache_path} (future runs load in ~5s)")
         
         logger.info(f"WikiText-103 ready: {len(all_tokens):,} tokens → "
                      f"{num_chunks:,} chunks of {max_length} tokens")
