@@ -533,7 +533,8 @@ class CustomTrainerAgent:
             dataset, 
             batch_size=batch_size,
             shuffle=True,
-            num_workers=0,  # Windows compatibility
+            num_workers=4,  # Parallel data loading to keep GPU fed
+            persistent_workers=True,
             pin_memory=True,
             drop_last=True,
             collate_fn=collate_fn,

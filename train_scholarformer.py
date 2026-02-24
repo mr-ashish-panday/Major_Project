@@ -68,7 +68,7 @@ CONFIG = {
     'sf_pretrain_batch_size': 4,
     'sf_pretrain_lr': 3e-4,
     'sf_pretrain_grad_accum': 8,
-    'sf_pretrain_epochs': 3,
+    'sf_pretrain_epochs': 1,
 
     # Stage 2: Fine-tuning
     'sf_finetune_batch_size': 4,
