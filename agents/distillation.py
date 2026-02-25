@@ -365,12 +365,15 @@ class DistillationAgent:
                if hasattr(self.student_tokenizer, 'tokenizer') 
                else self.student_tokenizer)
         
+        # Get actual device of student model (may be CPU after _swap_to_teacher)
+        student_device = next(self.student.parameters()).device
+        
         for i in range(num_questions):
             prompt = prompts[i % len(prompts)]
             
             try:
                 inputs = tok(prompt, return_tensors='pt')
-                input_ids = inputs['input_ids'].to(self.device)
+                input_ids = inputs['input_ids'].to(student_device)
                 
                 with torch.no_grad():
                     generated = self.student.generate(
