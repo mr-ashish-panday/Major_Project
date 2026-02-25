@@ -537,6 +537,46 @@ class ScholarFormerModel(nn.Module):
         elif isinstance(module, nn.Embedding):
             nn.init.normal_(module.weight, mean=0.0, std=self.config.initializer_range)
     
+    def resize_token_embeddings(self, new_vocab_size: int):
+        """
+        Resize token embedding and LM head to match a larger vocabulary.
+        
+        Needed when the tokenizer adds special tokens (e.g., section markers)
+        beyond the original vocab_size in the config/checkpoint.
+        
+        New embedding rows are initialized with small random values.
+        """
+        old_vocab_size = self.token_embedding.num_embeddings
+        if new_vocab_size == old_vocab_size:
+            return  # Nothing to do
+        
+        logger.info(f"Resizing embeddings: {old_vocab_size} → {new_vocab_size}")
+        
+        # Create new embedding
+        new_embedding = nn.Embedding(new_vocab_size, self.config.hidden_dim)
+        new_embedding.weight.data[:old_vocab_size] = self.token_embedding.weight.data
+        # Initialize new rows with small random values
+        if new_vocab_size > old_vocab_size:
+            nn.init.normal_(
+                new_embedding.weight.data[old_vocab_size:], 
+                mean=0.0, std=self.config.initializer_range
+            )
+        
+        self.token_embedding = new_embedding
+        
+        # Resize LM head
+        if self.config.tie_word_embeddings:
+            self.lm_head = nn.Linear(self.config.hidden_dim, new_vocab_size, bias=False)
+            self.lm_head.weight = self.token_embedding.weight
+        else:
+            old_lm_head = self.lm_head
+            self.lm_head = nn.Linear(self.config.hidden_dim, new_vocab_size, bias=False)
+            self.lm_head.weight.data[:old_vocab_size] = old_lm_head.weight.data
+        
+        # Update config
+        self.config.vocab_size = new_vocab_size
+        logger.info(f"Embeddings resized to {new_vocab_size}")
+    
     def _make_causal_mask(self, seq_len: int, device: torch.device, 
                            dtype: torch.dtype) -> torch.Tensor:
         """Create causal attention mask (lower triangular)."""

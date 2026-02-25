@@ -169,12 +169,15 @@ class DistillationAgent:
     def _load_teacher(self):
         """
         Load the fine-tuned Phi-3 teacher model.
-        Uses the same loading approach as the RAG pipeline.
+        Moves student to CPU first to free VRAM for the teacher.
         """
         if self.teacher_model is not None:
             return
         
         logger.info("Loading teacher model (Phi-3)...")
+        logger.info("Moving student to CPU to free VRAM...")
+        self.student = self.student.cpu()
+        torch.cuda.empty_cache()
         
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
         
@@ -190,7 +193,7 @@ class DistillationAgent:
         self.teacher_model = AutoModelForCausalLM.from_pretrained(
             base_model,
             quantization_config=quantization_config,
-            device_map="auto",
+            device_map={"": 0},  # Force all to GPU 0
             trust_remote_code=True,
             token=os.environ.get('HF_TOKEN'),
             torch_dtype=torch.float16,
@@ -222,6 +225,25 @@ class DistillationAgent:
         
         self.teacher_model.eval()
         logger.info("Teacher model loaded and ready")
+    
+    def _swap_to_student(self):
+        """Move teacher to CPU and student to GPU for training."""
+        if self.teacher_model is not None:
+            # Delete teacher to free VRAM
+            del self.teacher_model
+            self.teacher_model = None
+            torch.cuda.empty_cache()
+            logger.info("Teacher unloaded from GPU")
+        
+        self.student = self.student.to(self.device)
+        logger.info("Student moved to GPU for training")
+    
+    def _swap_to_teacher(self):
+        """Move student to CPU and reload teacher for generation."""
+        self.student = self.student.cpu()
+        torch.cuda.empty_cache()
+        # Teacher needs to be reloaded (was deleted)
+        self._load_teacher()
     
     def _generate_qa_from_teacher(self, paper_chunks: List[str], 
                                    num_qa_per_chunk: int = 3) -> List[Dict]:
@@ -468,13 +490,17 @@ class DistillationAgent:
             
             # Step 1: Teacher generates Q&A pairs
             if cycle == 0:
-                # First cycle: generate from paper chunks
+                # First cycle: generate from paper chunks (teacher loads automatically)
                 qa_pairs = self._generate_qa_from_teacher(
                     paper_chunks[:100],  # Limit to first 100 chunks per cycle
                     num_qa_per_chunk=qa_per_chunk
                 )
             else:
+                # Swap teacher back to GPU for generation
+                self._swap_to_teacher()
+                
                 # Subsequent cycles: augment with student-generated questions
+                # (student generates on CPU, which is slower but avoids VRAM issues)
                 student_questions = self._generate_questions_from_student(
                     num_questions=student_questions_per_cycle
                 )
@@ -497,7 +523,8 @@ class DistillationAgent:
             
             self.all_qa_pairs.extend(qa_pairs)
             
-            # Step 2: Train student on Q&A pairs
+            # Step 2: Swap student to GPU and train on Q&A pairs
+            self._swap_to_student()
             logger.info(f"Training student on {len(qa_pairs)} Q&A pairs...")
             train_result = self._train_student_on_qa(
                 qa_pairs, 

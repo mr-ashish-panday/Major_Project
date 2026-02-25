@@ -759,6 +759,14 @@ class CustomTrainerAgent:
         self.global_step = checkpoint.get('global_step', 0)
         self.best_loss = checkpoint.get('best_loss', float('inf'))
         
+        # Resize embeddings to match actual tokenizer vocab size
+        # (checkpoint may have been saved with vocab_size=32000 but
+        #  tokenizer adds section markers making it 32018)
+        actual_vocab_size = self.tokenizer.vocab_size
+        if actual_vocab_size != self.model.config.vocab_size:
+            self.model.resize_token_embeddings(actual_vocab_size)
+            self.model = self.model.to(self.device)
+        
         logger.info(f"✅ Checkpoint loaded: step {self.global_step}, "
                      f"best_loss {self.best_loss:.4f}, "
                      f"stage: {checkpoint.get('stage', 'unknown')}")
