@@ -215,25 +215,52 @@ def main():
     logger.info(f"Model: {model_info['total_params']:,} parameters on {model_info['device']}")
 
     # ──────────────────────────────────────────────────────────
-    # STAGE 1: WikiText-103 Pretraining
+    # STAGE 1: Load Pretrained Checkpoint (skip retraining)
     # ──────────────────────────────────────────────────────────
-    print_banner("📚 STAGE 1: WikiText-103 Pretraining")
-
-    try:
-        pretrain_result = trainer.pretrain(
-            num_epochs=CONFIG['sf_pretrain_epochs'],
-            batch_size=CONFIG['sf_pretrain_batch_size'],
-            learning_rate=CONFIG['sf_pretrain_lr'],
-            gradient_accumulation_steps=CONFIG['sf_pretrain_grad_accum'],
-        )
-        results['pretrain'] = pretrain_result
-        logger.info(f"✅ Stage 1 done in {pretrain_result['total_time_human']}")
-        logger.info(f"   Final loss: {pretrain_result['final_loss']:.4f}")
-    except Exception as e:
-        logger.error(f"❌ Stage 1 FAILED: {e}")
-        traceback.print_exc()
-        results['pretrain'] = {'error': str(e)}
-        # Don't stop — try to continue with whatever weights we have
+    checkpoint_path = os.path.join(
+        CONFIG['model_dir'], 'scholarformer', 'checkpoints', 'step_1000'
+    )
+    
+    if os.path.exists(checkpoint_path):
+        print_banner("📚 STAGE 1: Loading Pretrained Checkpoint")
+        try:
+            trainer.load_checkpoint(checkpoint_path)
+            results['pretrain'] = {
+                'stage': 'pretrain',
+                'status': 'loaded_from_checkpoint',
+                'checkpoint': checkpoint_path,
+                'global_step': trainer.global_step,
+                'best_loss': trainer.best_loss,
+            }
+            logger.info(f"✅ Loaded pretrained model from {checkpoint_path}")
+            logger.info(f"   Global step: {trainer.global_step}, Best loss: {trainer.best_loss:.4f}")
+        except Exception as e:
+            logger.error(f"❌ Failed to load checkpoint: {e}")
+            traceback.print_exc()
+            logger.info("Falling back to training from scratch...")
+            pretrain_result = trainer.pretrain(
+                num_epochs=CONFIG['sf_pretrain_epochs'],
+                batch_size=CONFIG['sf_pretrain_batch_size'],
+                learning_rate=CONFIG['sf_pretrain_lr'],
+                gradient_accumulation_steps=CONFIG['sf_pretrain_grad_accum'],
+            )
+            results['pretrain'] = pretrain_result
+    else:
+        print_banner("📚 STAGE 1: WikiText-103 Pretraining (no checkpoint found)")
+        try:
+            pretrain_result = trainer.pretrain(
+                num_epochs=CONFIG['sf_pretrain_epochs'],
+                batch_size=CONFIG['sf_pretrain_batch_size'],
+                learning_rate=CONFIG['sf_pretrain_lr'],
+                gradient_accumulation_steps=CONFIG['sf_pretrain_grad_accum'],
+            )
+            results['pretrain'] = pretrain_result
+            logger.info(f"✅ Stage 1 done in {pretrain_result['total_time_human']}")
+            logger.info(f"   Final loss: {pretrain_result['final_loss']:.4f}")
+        except Exception as e:
+            logger.error(f"❌ Stage 1 FAILED: {e}")
+            traceback.print_exc()
+            results['pretrain'] = {'error': str(e)}
 
     # ──────────────────────────────────────────────────────────
     # STAGE 2: Paper Fine-tuning
