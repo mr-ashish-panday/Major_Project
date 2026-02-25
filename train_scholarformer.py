@@ -267,28 +267,57 @@ def main():
     # ──────────────────────────────────────────────────────────
     print_banner("🎓 STAGE 2: Research Paper Fine-tuning")
 
-    papers = load_validated_papers()
+    # Check for existing finetuned checkpoint (skip if already done)
+    checkpoint_base = os.path.join(CONFIG['model_dir'], 'scholarformer', 'checkpoints')
+    finetuned_checkpoints = sorted([
+        d for d in os.listdir(checkpoint_base)
+        if (d.startswith('finetuned_') or d == 'best') and os.path.isdir(os.path.join(checkpoint_base, d))
+    ]) if os.path.exists(checkpoint_base) else []
+    
+    # Prefer 'finetuned_*' over 'best'
+    ft_pick = next(
+        (d for d in reversed(finetuned_checkpoints) if d.startswith('finetuned_')),
+        finetuned_checkpoints[-1] if finetuned_checkpoints else None
+    )
 
-    if papers:
+    if ft_pick:
+        # Already finetuned — skip Stage 2 and load the latest checkpoint
+        ft_path = os.path.join(checkpoint_base, ft_pick)
+        logger.info(f"✅ Found finetuned checkpoint: {ft_pick}")
+        logger.info(f"   Skipping Stage 2, loading from {ft_path}")
         try:
-            finetune_result = trainer.finetune(
-                validated_papers=papers,
-                num_epochs=CONFIG['sf_finetune_epochs'],
-                batch_size=CONFIG['sf_finetune_batch_size'],
-                learning_rate=CONFIG['sf_finetune_lr'],
-                gradient_accumulation_steps=CONFIG['sf_finetune_grad_accum'],
-            )
-            results['finetune'] = finetune_result
-            logger.info(f"✅ Stage 2 done in {finetune_result['total_time_human']}")
-            logger.info(f"   Final loss: {finetune_result['final_loss']:.4f}")
+            trainer.load_checkpoint(ft_path)
+            results['finetune'] = {
+                'stage': 'finetune',
+                'status': 'loaded_from_checkpoint',
+                'checkpoint': ft_path,
+            }
         except Exception as e:
-            logger.error(f"❌ Stage 2 FAILED: {e}")
-            traceback.print_exc()
+            logger.error(f"❌ Failed to load finetuned checkpoint: {e}")
             results['finetune'] = {'error': str(e)}
     else:
-        logger.warning("⚠️  No papers found — skipping Stage 2")
-        logger.warning("   Place papers in ./data/processed/ as JSON files")
-        results['finetune'] = {'skipped': 'no papers found'}
+        papers = load_validated_papers()
+
+        if papers:
+            try:
+                finetune_result = trainer.finetune(
+                    validated_papers=papers,
+                    num_epochs=CONFIG['sf_finetune_epochs'],
+                    batch_size=CONFIG['sf_finetune_batch_size'],
+                    learning_rate=CONFIG['sf_finetune_lr'],
+                    gradient_accumulation_steps=CONFIG['sf_finetune_grad_accum'],
+                )
+                results['finetune'] = finetune_result
+                logger.info(f"✅ Stage 2 done in {finetune_result['total_time_human']}")
+                logger.info(f"   Final loss: {finetune_result['final_loss']:.4f}")
+            except Exception as e:
+                logger.error(f"❌ Stage 2 FAILED: {e}")
+                traceback.print_exc()
+                results['finetune'] = {'error': str(e)}
+        else:
+            logger.warning("⚠️  No papers found — skipping Stage 2")
+            logger.warning("   Place papers in ./data/processed/ as JSON files")
+            results['finetune'] = {'skipped': 'no papers found'}
 
     # ──────────────────────────────────────────────────────────
     # STAGE 3: Cross-Model Distillation
