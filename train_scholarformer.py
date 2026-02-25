@@ -267,6 +267,9 @@ def main():
     # ──────────────────────────────────────────────────────────
     print_banner("🎓 STAGE 2: Research Paper Fine-tuning")
 
+    # Always load papers (needed by both Stage 2 and Stage 3)
+    papers = load_validated_papers()
+
     # Check for existing finetuned checkpoint (skip if already done)
     checkpoint_base = os.path.join(CONFIG['model_dir'], 'scholarformer', 'checkpoints')
     finetuned_checkpoints = sorted([
@@ -296,8 +299,6 @@ def main():
             logger.error(f"❌ Failed to load finetuned checkpoint: {e}")
             results['finetune'] = {'error': str(e)}
     else:
-        papers = load_validated_papers()
-
         if papers:
             try:
                 finetune_result = trainer.finetune(
