@@ -199,9 +199,13 @@ def _validate_answer(text, question):
     is_aiml_question = any(t in q_lower for t in aiml_terms) or is_research_question(question)
     if is_aiml_question and not has_aiml:
         return False, "off_topic"
-    # Check for excessive stuck words (more than 2 words with 12+ chars)
-    long_words = re.findall(r'\b[a-zA-Z]{12,}\b', text)
-    if len(long_words) > 3:
+    # Check for ACTUAL garbling: lowercase words stuck together without space
+    # Pattern: two runs of 5+ lowercase letters with no space between them
+    # e.g. "effectivenessthis", "languagelearning" but NOT "implementation"
+    stuck = re.findall(r'[a-z]{5,}[a-z]{5,}', text.replace(' ', ''))
+    # Count instances where a 15+ char lowercase run exists in original text (no space)
+    real_stuck = re.findall(r'(?<!\w)[a-z]{15,}(?!\w)', text)
+    if len(real_stuck) > 2:
         return False, "garbled"
     return True, "ok"
 
