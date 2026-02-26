@@ -112,34 +112,23 @@ def load_system():
     return model, tokenizer, vector_store
 
 
-def generate_answer(model, tokenizer, question):
-    """Generate answer directly - NO paper context injection."""
-    system = (
-        "You are ScholarMind, an expert AI research assistant. "
-        "Answer questions about AI, machine learning, deep learning, NLP, "
-        "transformers, and LLMs with clear, accurate explanations. "
-        "If the question is not about AI/ML, politely say you only help with AI/ML topics. "
-        "Write 3-4 clear sentences with proper grammar."
-    )
-
+def _generate(model, tokenizer, system, user, max_tokens=120):
+    """Core generation function."""
     prompt = (
         SYS + "\n" + system + END + "\n"
-        + USR + "\n" + question + END + "\n"
+        + USR + "\n" + user + END + "\n"
         + AST + "\n"
     )
-
     inputs = tokenizer(
         prompt, return_tensors="pt", truncation=True, max_length=1024
     ).to(model.device)
 
-    # Suppress stderr during generation too
     old_stderr = sys.stderr
     sys.stderr = io.StringIO()
-
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=120,
+            max_new_tokens=max_tokens,
             temperature=0.2,
             top_p=0.8,
             top_k=30,
@@ -148,7 +137,6 @@ def generate_answer(model, tokenizer, question):
             no_repeat_ngram_size=3,
             pad_token_id=tokenizer.pad_token_id,
         )
-
     sys.stderr = old_stderr
 
     generated = outputs[0][inputs["input_ids"].shape[1]:]
@@ -159,8 +147,39 @@ def generate_answer(model, tokenizer, question):
         last_end = max(answer.rfind("."), answer.rfind("!"), answer.rfind("?"))
         if last_end > 20:
             answer = answer[:last_end + 1]
-
     return answer
+
+
+def step1_domain_answer(model, tokenizer, question):
+    """STEP 1: Fine-tuned model generates domain answer."""
+    system = (
+        "You are an AI research expert. Answer questions about AI, "
+        "machine learning, deep learning, NLP, transformers, and LLMs. "
+        "If the question is not about AI/ML, say: I only answer AI/ML questions. "
+        "Give a technical, informative answer."
+    )
+    return _generate(model, tokenizer, system, question, max_tokens=120)
+
+
+def step2_polish(model, tokenizer, question, draft):
+    """STEP 2: Base model (adapter OFF) reformats with proper grammar."""
+    if hasattr(model, 'disable_adapter_layers'):
+        model.disable_adapter_layers()
+
+    system = (
+        "You are a professional scientific writer. "
+        "Rewrite the following draft answer with perfect grammar, "
+        "clear structure, and proper punctuation. "
+        "Keep the same meaning and technical content. "
+        "Write 3-4 polished sentences. Do not add new information."
+    )
+    user = f"Question: {question}\n\nDraft answer to rewrite:\n{draft}"
+    result = _generate(model, tokenizer, system, user, max_tokens=150)
+
+    if hasattr(model, 'enable_adapter_layers'):
+        model.enable_adapter_layers()
+
+    return result
 
 
 def search_papers(vector_store, question):
@@ -227,8 +246,11 @@ def main():
 
         t0 = time.time()
 
-        # Generate answer (no RAG context - just direct answer)
-        answer = generate_answer(model, tokenizer, question)
+        # STEP 1: Fine-tuned model generates domain answer
+        draft = step1_domain_answer(model, tokenizer, question)
+
+        # STEP 2: Base model (adapter OFF) polishes with proper grammar
+        answer = step2_polish(model, tokenizer, question, draft)
 
         # Find related papers (shown as references only)
         papers = search_papers(vector_store, question)
