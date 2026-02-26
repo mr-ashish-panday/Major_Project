@@ -148,11 +148,13 @@ def _gen(model, tok, system, user, max_tokens=150, use_adapter=True):
 
 
 def _clean(text):
-    """Strip meta-commentary and artifacts."""
+    """Strip meta-commentary, fake citations, and fix stuck words."""
     if not text:
         return text
+    # Remove code fences
     text = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
     text = text.replace('```', '')
+    # Remove meta-commentary
     for p in [
         r"Here'?t?\s*be\s+any\s+spelled.*?(?:here you go\s*:?\s*)",
         r"(?:I will|Let me|I have)\s+(?:proofread|check|review|correct).*?(?::\s*|\.\.\.+\s*)",
@@ -162,13 +164,46 @@ def _clean(text):
         r"^.*?here you go\s*:?\s*", r"I hope (?:this|that).*$",
     ]:
         text = re.sub(p, '', text, flags=re.IGNORECASE | re.DOTALL)
+    # Remove fake URLs/citations
+    text = re.sub(r'\(https?://[^)]*\)', '', text)
+    text = re.sub(r'https?://\S+', '', text)
+    # Fix stuck-together words (camelCase boundaries): "effectivenessthis" → "effectiveness this"
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    # Fix lowercase stuck words: "effectivenessthis" pattern
+    # Split words that have 15+ chars with no space (likely stuck)
+    text = re.sub(r'([a-z]{6,})([a-z]{6,})', lambda m: m.group(1) + ' ' + m.group(2) if len(m.group(0)) > 14 else m.group(0), text)
+    # Remove emoji/non-ascii
     text = re.sub(r'[^\x00-\x7F]+', '', text)
+    # Clean whitespace
     text = re.sub(r'\s+', ' ', text).strip()
+    # Trim at last sentence
     if text and text[-1] not in ".!?":
         last = max(text.rfind("."), text.rfind("!"), text.rfind("?"))
         if last > 20:
             text = text[:last + 1]
     return text.strip()
+
+
+def _validate_answer(text, question):
+    """Check answer quality. Returns (is_ok, reason)."""
+    if not text or len(text) < 30:
+        return False, "too_short"
+    # Check for AI/ML relevance (at least one keyword should appear)
+    aiml_terms = ["model", "learning", "neural", "train", "data", "language",
+                  "transformer", "attention", "parameter", "llm", "nlp",
+                  "fine-tun", "inference", "network", "ai", "ml", "deep",
+                  "bert", "gpt", "lora", "adapter", "embedding"]
+    text_lower = text.lower()
+    has_aiml = any(t in text_lower for t in aiml_terms)
+    q_lower = question.lower()
+    is_aiml_question = any(t in q_lower for t in aiml_terms) or is_research_question(question)
+    if is_aiml_question and not has_aiml:
+        return False, "off_topic"
+    # Check for excessive stuck words (more than 2 words with 12+ chars)
+    long_words = re.findall(r'\b[a-zA-Z]{12,}\b', text)
+    if len(long_words) > 3:
+        return False, "garbled"
+    return True, "ok"
 
 
 # ============================================================
@@ -275,16 +310,32 @@ def main():
         t0 = time.time()
 
         is_research = is_research_question(question)
+        papers = []
 
-        if is_research:
-            # RESEARCH PATH: trained model draft → RAG → combine
-            draft = research_draft(model, tok, question)
-            papers, evidence = search_papers(vs, question)
-            final = research_combine(model, tok, question, draft, evidence)
-        else:
-            # SIMPLE PATH: base model answers directly
-            final = answer_simple(model, tok, question)
-            papers = []
+        # Generate answer (with retry if validation fails)
+        for attempt in range(2):
+            if is_research:
+                # RESEARCH PATH: trained model draft → RAG → combine
+                draft = research_draft(model, tok, question)
+                papers, evidence = search_papers(vs, question)
+                final = research_combine(model, tok, question, draft, evidence)
+            else:
+                # SIMPLE PATH: base model answers directly
+                final = answer_simple(model, tok, question)
+
+            # Validate answer
+            is_ok, reason = _validate_answer(final, question)
+            if is_ok:
+                break
+            # If failed and first attempt, retry with stricter prompt
+            if attempt == 0 and reason in ("off_topic", "garbled", "too_short"):
+                if not is_research:
+                    # Try research path instead
+                    is_research = True
+                    continue
+                else:
+                    # Retry with same path
+                    continue
 
         stop.set()
         anim.join()
