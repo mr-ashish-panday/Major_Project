@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Add project to path
 import sys
 sys.path.insert(0, os.path.dirname(__file__))
 from config import CONFIG
@@ -36,7 +35,7 @@ bnb = BitsAndBytesConfig(
     bnb_4bit_use_double_quant=True,
 )
 
-model = AutoModelForCausalLM.from_pretrained(
+base_model = AutoModelForCausalLM.from_pretrained(
     "microsoft/Phi-3-mini-4k-instruct",
     quantization_config=bnb,
     device_map="auto",
@@ -49,9 +48,10 @@ adapters = sorted(glob.glob("models/fine_tuned_*"))
 if adapters:
     adapter_path = adapters[-1]
     print(f"Loading LoRA adapter: {adapter_path}")
-    model = PeftModel.from_pretrained(model, adapter_path)
+    model = PeftModel.from_pretrained(base_model, adapter_path)
 else:
     print("No LoRA adapter found, using base Phi-3")
+    model = base_model
 
 tok = AutoTokenizer.from_pretrained(
     "microsoft/Phi-3-mini-4k-instruct",
@@ -63,11 +63,48 @@ if tok.pad_token is None:
 
 print(f"Model loaded in {time.time() - t0:.1f}s\n")
 
-# Phi-3 special tokens
+# Phi-3 chat template tokens
 SYS = "<" + "|system|" + ">"
 END = "<" + "|end|" + ">"
 USR = "<" + "|user|" + ">"
 AST = "<" + "|assistant|" + ">"
+
+
+def generate_answer(mdl, prompt, max_tokens=200):
+    """Generate with tight parameters to avoid rambling."""
+    inputs = tok(prompt, return_tensors="pt", truncation=True, max_length=3072).to(mdl.device)
+    t1 = time.time()
+    with torch.no_grad():
+        out = mdl.generate(
+            **inputs,
+            max_new_tokens=max_tokens,
+            temperature=0.3,          # Low temp = more focused
+            top_p=0.85,
+            top_k=40,
+            do_sample=True,
+            repetition_penalty=1.3,   # Strong penalty to stop loops
+            no_repeat_ngram_size=4,   # Block repeating 4-grams
+            pad_token_id=tok.pad_token_id,
+        )
+    latency = time.time() - t1
+    generated = out[0][inputs["input_ids"].shape[1]:]
+    answer = tok.decode(generated, skip_special_tokens=True).strip()
+    return answer, latency
+
+
+def build_rag_prompt(question, context):
+    """Build a clean RAG prompt."""
+    return (
+        SYS + "\n"
+        "You are ScholarMind, an expert AI research assistant. "
+        "Answer the question using ONLY the provided research context. "
+        "Be concise and direct. Cite sources as [1], [2], [3]." + END + "\n"
+        + USR + "\n"
+        "Research context:\n" + context + "\n\n"
+        "Question: " + question + END + "\n"
+        + AST + "\n"
+    )
+
 
 # Test questions
 questions = [
@@ -81,63 +118,46 @@ for i, q in enumerate(questions, 1):
     print(f"  Question {i}: {q}")
     print("=" * 60)
 
-    # RAG: Search knowledge base for relevant papers
+    # RAG: Search knowledge base
     retrieved = vector_store.search(q, top_k=3)
 
     context_parts = []
     citations = []
     for j, doc in enumerate(retrieved, 1):
-        content = doc.get("content", "")[:600]
+        content = doc.get("content", "")[:400]  # Shorter chunks = cleaner
+        # Clean up the content
+        content = content.replace("\n", " ").strip()
         meta = doc.get("metadata", {})
         title = meta.get("title", "Unknown")
         authors = meta.get("authors", "Unknown")
         score = doc.get("score", 0)
-        context_parts.append(f"[{j}] (Source: {title})\n{content}")
+        context_parts.append(f"[{j}] From '{title}': {content}")
         citations.append({"id": j, "title": title, "authors": authors, "score": score})
 
     context = "\n\n".join(context_parts)
+    prompt = build_rag_prompt(q, context)
 
-    prompt = (
-        SYS + "\n"
-        "You are ScholarMind, an expert AI research assistant. "
-        "Answer based on the provided research context. "
-        "Cite sources as [1], [2], etc. Give a clear, direct answer." + END + "\n"
-        + USR + "\n"
-        "Based on the following research papers, answer my question.\n\n"
-        "RESEARCH CONTEXT:\n" + context + "\n\n"
-        "QUESTION: " + q + "\n\n"
-        "Provide a clear, direct answer with citations:" + END + "\n"
-        + AST + "\n"
-    )
-
-    inputs = tok(prompt, return_tensors="pt", truncation=True, max_length=3072).to(model.device)
-
-    t1 = time.time()
-    with torch.no_grad():
-        out = model.generate(
-            **inputs,
-            max_new_tokens=300,
-            temperature=0.7,
-            top_p=0.9,
-            do_sample=True,
-            repetition_penalty=1.2,
-            pad_token_id=tok.pad_token_id,
-        )
-    latency = time.time() - t1
-
-    # Extract only generated tokens
-    generated = out[0][inputs["input_ids"].shape[1]:]
-    answer = tok.decode(generated, skip_special_tokens=True).strip()
+    # Generate with fine-tuned adapter
+    answer, latency = generate_answer(model, prompt)
 
     print(f"\n  Answer ({latency:.1f}s):\n")
-    print(f"  {answer}\n")
+    # Word wrap for terminal
+    words = answer.split()
+    line = "  "
+    for w in words:
+        if len(line) + len(w) + 1 > 80:
+            print(line)
+            line = "  " + w
+        else:
+            line += " " + w if line.strip() else "  " + w
+    if line.strip():
+        print(line)
 
     # Print citations
-    print("  Sources:")
+    print(f"\n  Sources:")
     for c in citations:
         print(f"    [{c['id']}] {c['title']}")
-        print(f"        Authors: {c['authors']}")
-        print(f"        Relevance: {c['score']:.0%}")
+        print(f"        by {c['authors']} | Relevance: {c['score']:.0%}")
     print()
 
 print("=" * 60)
