@@ -420,6 +420,40 @@ def research_combine(model, tok, question, draft, evidence):
                 max_tokens=150, use_adapter=False)
 
 
+# ============================================================
+# STEP 4: Pure spacing/grammar fixer (base model, adapter OFF)
+# Only fixes stuck words and spacing — no content changes
+# ============================================================
+def step4_fix_spacing(model, tok, text):
+    """Fix stuck words and spacing issues using base model."""
+    # First pass: regex-based fixes for obvious stuck words
+    # Split camelCase-like patterns
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+    # Split very long lowercase runs (15+ chars with no space)
+    text = re.sub(r'([a-z]{5,})([a-z]{5,})', 
+                  lambda m: m.group(1) + ' ' + m.group(2) if len(m.group(0)) > 14 else m.group(0), 
+                  text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    # Check if text still has stuck words (any 13+ char lowercase run)
+    has_stuck = bool(re.search(r'[a-z]{13,}', text))
+    if not has_stuck:
+        return text  # Already clean, skip model call
+    
+    # Second pass: use base model only if regex wasn't enough
+    sys_msg = (
+        "Fix ONLY spacing errors in the text below. "
+        "Split stuck-together words. Examples: "
+        "'physicsa ree vident' → 'physics are evident', "
+        "'Learningsystems' → 'Learning systems', "
+        "'criticaltophysical' → 'critical to physical'. "
+        "Do NOT change any words. Do NOT add content. Do NOT add commentary. "
+        "Output ONLY the spacing-fixed text."
+    )
+    return _gen(model, tok, sys_msg, f"Fix spacing:\n{text}",
+                max_tokens=180, use_adapter=False)
+
+
 def wrap_text(text, width=68, indent=4):
     prefix = " " * indent
     words = text.split()
@@ -555,10 +589,12 @@ def main():
         # Generate answer (with retry if validation fails)
         for attempt in range(2):
             if is_research:
-                # RESEARCH PATH: trained model draft → RAG → combine
+                # RESEARCH PATH: trained model draft → RAG → combine → fix spacing
                 draft = research_draft(model, tok, effective_question)
                 papers, evidence = search_papers(vs, effective_question)
                 final = research_combine(model, tok, effective_question, draft, evidence)
+                # Step 4: Fix stuck words from trained model
+                final = step4_fix_spacing(model, tok, final)
             else:
                 # SIMPLE PATH: base model answers directly
                 final = answer_simple(model, tok, effective_question)
@@ -579,7 +615,7 @@ def main():
         anim.join()
         latency = time.time() - t0
 
-        route = "Research" if is_research else "Direct"
+        route = "Research" if is_research else "Definition"
         print(f"  ScholarMind ({latency:.1f}s) [{route}]:\n")
         print(wrap_text(final))
 
