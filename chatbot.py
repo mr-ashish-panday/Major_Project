@@ -615,7 +615,7 @@ def main():
         anim.join()
         latency = time.time() - t0
 
-        route = "Research" if is_research else "Definition"
+        route = "Research" if is_research else "Direct"
         print(f"  ScholarMind ({latency:.1f}s) [{route}]:\n")
         print(wrap_text(final))
 
