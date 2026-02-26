@@ -78,10 +78,13 @@ def generate_answer(model, tokenizer, question):
     """Generate a clean answer from Phi-3."""
     prompt = (
         SYS + "\n"
-        "You are ScholarMind, an expert AI research assistant specializing in "
-        "machine learning, NLP, and large language models. "
-        "Give clear, concise, and accurate answers. "
-        "Keep your response under 150 words." + END + "\n"
+        "You are ScholarMind, an AI research assistant that ONLY answers questions "
+        "about artificial intelligence, machine learning, deep learning, NLP, "
+        "transformers, LLMs, and related computer science research topics. "
+        "If the user asks about anything unrelated to AI/ML research, politely decline "
+        "and say you can only help with AI and ML research questions. "
+        "Keep answers concise, accurate, and under 100 words. "
+        "End with a complete sentence." + END + "\n"
         + USR + "\n" + question + END + "\n"
         + AST + "\n"
     )
@@ -94,13 +97,13 @@ def generate_answer(model, tokenizer, question):
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=200,
-            temperature=0.3,
-            top_p=0.85,
-            top_k=40,
+            max_new_tokens=120,
+            temperature=0.2,
+            top_p=0.8,
+            top_k=30,
             do_sample=True,
-            repetition_penalty=1.3,
-            no_repeat_ngram_size=4,
+            repetition_penalty=1.4,
+            no_repeat_ngram_size=3,
             pad_token_id=tokenizer.pad_token_id,
         )
     latency = time.time() - t0
@@ -108,13 +111,11 @@ def generate_answer(model, tokenizer, question):
     generated = outputs[0][inputs["input_ids"].shape[1]:]
     answer = tokenizer.decode(generated, skip_special_tokens=True).strip()
 
-    # Trim at last complete sentence
+    # Trim at last complete sentence to avoid cut-off gibberish
     if answer and answer[-1] not in ".!?":
-        for end_char in [".", "!", "?"]:
-            idx = answer.rfind(end_char)
-            if idx > len(answer) * 0.3:
-                answer = answer[:idx + 1]
-                break
+        last_end = max(answer.rfind("."), answer.rfind("!"), answer.rfind("?"))
+        if last_end > 20:  # Keep at least 20 chars
+            answer = answer[:last_end + 1]
 
     return answer, latency
 
@@ -181,12 +182,13 @@ def main():
         print()
         print(wrap_text(answer))
 
-        # Find related papers
+        # Find related papers (only show if relevance > 35%)
         papers = find_related_papers(vector_store, question, top_k=3)
-        if papers:
+        relevant = [p for p in papers if p["score"] > 0.35]
+        if relevant:
             print()
             print("  Related Papers:")
-            for i, p in enumerate(papers, 1):
+            for i, p in enumerate(relevant, 1):
                 print(f"    [{i}] {p['title']}")
                 print(f"        by {p['authors']} ({p['score']:.0%} match)")
 
