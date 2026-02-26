@@ -112,16 +112,19 @@ def load_system():
     return model, tok, vs
 
 
-def _gen(model, tok, system, user, max_tokens=150, use_adapter=True):
-    """Generate text. use_adapter=False tries context manager to disable adapter."""
+def _gen(model, tok, system, user, max_tokens=150, use_adapter=True, prefix=""):
+    """Generate text with optional output prefix to guide the start."""
     prompt = (SYS + "\n" + system + END + "\n"
               + USR + "\n" + user + END + "\n"
-              + AST + "\n")
+              + AST + "\n" + prefix)
     inputs = tok(prompt, return_tensors="pt", truncation=True,
                  max_length=2048).to(model.device)
 
     old = sys.stderr
     sys.stderr = io.StringIO()
+
+    # Stop sequences to prevent rambling
+    stop_ids = tok.encode("\n\n", add_special_tokens=False)
 
     gen_kwargs = dict(
         **inputs,
@@ -134,7 +137,6 @@ def _gen(model, tok, system, user, max_tokens=150, use_adapter=True):
 
     with torch.no_grad():
         if not use_adapter and hasattr(model, 'disable_adapter'):
-            # Use context manager to cleanly disable adapter
             with model.disable_adapter():
                 out = model.generate(**gen_kwargs)
         else:
@@ -144,6 +146,9 @@ def _gen(model, tok, system, user, max_tokens=150, use_adapter=True):
 
     gen = out[0][inputs["input_ids"].shape[1]:]
     ans = tok.decode(gen, skip_special_tokens=True).strip()
+    # Prepend the prefix back (it was in the prompt but decoded tokens start after)
+    if prefix and not ans.startswith(prefix.strip()):
+        ans = prefix.strip() + " " + ans
     return _clean(ans)
 
 
@@ -212,17 +217,59 @@ def _validate_answer(text, question):
 
 # ============================================================
 # SIMPLE PATH: Base model answers directly (adapter OFF)
+# Few-shot examples + output prefix for accurate definitions
 # ============================================================
 def answer_simple(model, tok, question):
     """For simple definition questions - clean base model answer."""
     sys_msg = (
-        "You are ScholarMind, an AI research assistant. "
-        "Give a clear, accurate, and concise answer about AI/ML topics. "
-        "If the question is not about AI/ML, politely decline. "
-        "Write 2-3 sentences with perfect grammar."
+        "You are ScholarMind, an expert AI research assistant. "
+        "Give accurate, concise definitions of AI/ML concepts. "
+        "If the question is not about AI/ML, say: I specialize in AI and machine learning topics only. "
+        "Structure: First define the term, then explain how it works, then give one application. "
+        "Write exactly 2-3 grammatically perfect sentences."
     )
-    return _gen(model, tok, sys_msg, question,
-                max_tokens=120, use_adapter=False)
+    # Few-shot examples to show exact expected format
+    user = (
+        "Example question: What is attention mechanism?\n"
+        "Example answer: The attention mechanism is a component in neural networks that allows "
+        "models to focus on relevant parts of the input sequence when producing an output. "
+        "It computes weighted scores over input tokens, enabling the model to selectively "
+        "attend to important information. Attention is the core building block of Transformer "
+        "architectures used in models like BERT and GPT.\n\n"
+        f"Now answer this question: {question}"
+    )
+    # Output prefix forces correct start
+    prefix = _get_prefix(question)
+    return _gen(model, tok, sys_msg, user,
+                max_tokens=120, use_adapter=False, prefix=prefix)
+
+
+def _get_prefix(question):
+    """Generate a correct output prefix to guide the model's start."""
+    q = question.lower().strip().rstrip('?').strip()
+    prefixes = {
+        "what is llm": "A Large Language Model (LLM) is",
+        "what is lora": "Low-Rank Adaptation (LoRA) is",
+        "what is an llm": "A Large Language Model (LLM) is",
+        "explain transformers": "Transformers are",
+        "what is transformer": "A Transformer is",
+        "what is attention mechanism": "The attention mechanism is",
+        "what is attention": "The attention mechanism is",
+        "what is fine-tuning": "Fine-tuning is",
+        "what is fine tuning": "Fine-tuning is",
+        "what is knowledge distillation": "Knowledge distillation is",
+        "what is nlp": "Natural Language Processing (NLP) is",
+        "what is deep learning": "Deep learning is",
+        "what is neural network": "A neural network is",
+        "what is bert": "BERT (Bidirectional Encoder Representations from Transformers) is",
+        "what is gpt": "GPT (Generative Pre-trained Transformer) is",
+        "what is rag": "Retrieval-Augmented Generation (RAG) is",
+        "what is embedding": "An embedding is",
+    }
+    for key, val in prefixes.items():
+        if key in q:
+            return val
+    return ""
 
 
 # ============================================================
@@ -231,9 +278,10 @@ def answer_simple(model, tok, question):
 def research_draft(model, tok, question):
     """Trained model generates research-informed draft."""
     sys_msg = (
-        "You are an AI research expert trained on scientific papers. "
-        "Answer about latest findings, developments, and research in AI/ML. "
-        "Be specific and mention relevant techniques or methods."
+        "You are an AI research expert trained on the latest scientific papers. "
+        "Answer about recent findings, developments, and research in AI/ML. "
+        "Structure: First state the research area. Then describe 1-2 specific recent methods or findings. "
+        "Then mention the impact or improvement. Be specific and technical."
     )
     return _gen(model, tok, sys_msg, question,
                 max_tokens=100, use_adapter=True)
@@ -262,16 +310,18 @@ def search_papers(vs, question):
 def research_combine(model, tok, question, draft, evidence):
     """Combine draft + paper evidence into final research answer."""
     sys_msg = (
-        "You received a research draft and paper excerpts. "
-        "Write a clean answer combining the key findings. "
-        "Include citations [1], [2] when referencing papers. "
-        "Fix any errors in the draft. Write 3-4 clear sentences."
+        "You received a research draft and paper excerpts about AI/ML. "
+        "Write a polished answer combining the key findings. "
+        "Structure: First state the research topic. Then describe 1-2 key findings from the papers. "
+        "Then mention the significance. "
+        "Include citations [1], [2] when referencing specific papers. "
+        "Fix any factual errors. Write 3-4 grammatically perfect sentences."
     )
     user = (
         f"Question: {question}\n\n"
-        f"Research draft:\n{draft}\n\n"
-        f"Papers:\n{evidence}\n\n"
-        f"Combined answer with citations:"
+        f"Research draft (may have errors):\n{draft}\n\n"
+        f"Paper excerpts:\n{evidence}\n\n"
+        f"Write a polished answer:"
     )
     return _gen(model, tok, sys_msg, user,
                 max_tokens=150, use_adapter=False)
