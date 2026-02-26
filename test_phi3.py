@@ -1,4 +1,4 @@
-"""Quick terminal test for Phi-3 model output."""
+"""Quick terminal test for Phi-3 model with RAG citations."""
 import os
 import glob
 import time
@@ -9,9 +9,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Add project to path
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
+from config import CONFIG
+from agents.vector_store import VectorStoreAgent
+
 print("=" * 60)
-print("  Phi-3 Terminal Test")
+print("  Phi-3 Terminal Test (with RAG Citations)")
 print("=" * 60)
+
+# Load vector store
+print("\nLoading knowledge base...")
+vector_store = VectorStoreAgent(CONFIG)
+stats = vector_store.get_stats()
+print(f"Knowledge base: {stats.get('total_documents', 0)} documents loaded")
 
 # Load model
 print("\nLoading Phi-3 (4-bit quantized)...")
@@ -69,26 +81,46 @@ for i, q in enumerate(questions, 1):
     print(f"  Question {i}: {q}")
     print("=" * 60)
 
+    # RAG: Search knowledge base for relevant papers
+    retrieved = vector_store.search(q, top_k=3)
+
+    context_parts = []
+    citations = []
+    for j, doc in enumerate(retrieved, 1):
+        content = doc.get("content", "")[:600]
+        meta = doc.get("metadata", {})
+        title = meta.get("title", "Unknown")
+        authors = meta.get("authors", "Unknown")
+        score = doc.get("score", 0)
+        context_parts.append(f"[{j}] (Source: {title})\n{content}")
+        citations.append({"id": j, "title": title, "authors": authors, "score": score})
+
+    context = "\n\n".join(context_parts)
+
     prompt = (
         SYS + "\n"
-        "You are a helpful AI research assistant specializing in NLP and LLMs. "
-        "Give clear, concise answers." + END + "\n"
+        "You are ScholarMind, an expert AI research assistant. "
+        "Answer based on the provided research context. "
+        "Cite sources as [1], [2], etc. Give a clear, direct answer." + END + "\n"
         + USR + "\n"
-        + q + END + "\n"
+        "Based on the following research papers, answer my question.\n\n"
+        "RESEARCH CONTEXT:\n" + context + "\n\n"
+        "QUESTION: " + q + "\n\n"
+        "Provide a clear, direct answer with citations:" + END + "\n"
         + AST + "\n"
     )
 
-    inputs = tok(prompt, return_tensors="pt", truncation=True, max_length=2048).to(model.device)
+    inputs = tok(prompt, return_tensors="pt", truncation=True, max_length=3072).to(model.device)
 
     t1 = time.time()
     with torch.no_grad():
         out = model.generate(
             **inputs,
-            max_new_tokens=256,
+            max_new_tokens=300,
             temperature=0.7,
             top_p=0.9,
             do_sample=True,
-            repetition_penalty=1.15,
+            repetition_penalty=1.2,
             pad_token_id=tok.pad_token_id,
         )
     latency = time.time() - t1
@@ -99,6 +131,14 @@ for i, q in enumerate(questions, 1):
 
     print(f"\n  Answer ({latency:.1f}s):\n")
     print(f"  {answer}\n")
+
+    # Print citations
+    print("  Sources:")
+    for c in citations:
+        print(f"    [{c['id']}] {c['title']}")
+        print(f"        Authors: {c['authors']}")
+        print(f"        Relevance: {c['score']:.0%}")
+    print()
 
 print("=" * 60)
 print("  Done!")
