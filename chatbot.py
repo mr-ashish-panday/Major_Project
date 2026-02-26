@@ -216,15 +216,12 @@ def step4_polish(model, tokenizer, question, answer):
         model.disable_adapter_layers()
 
     sys_msg = (
-        "You are a grammar checker. Review the following answer for: "
-        "- Spelling errors "
-        "- Grammar mistakes "
-        "- Incomplete words or sentences "
-        "- Nonsensical phrases "
-        "Rewrite it with corrections. Keep the same meaning and length. "
-        "If the answer is already correct, return it as-is."
+        "Fix any spelling errors, grammar mistakes, or incomplete words in the text below. "
+        "Output ONLY the corrected text. Do NOT add commentary, explanations, or notes. "
+        "Do NOT say things like 'here is the corrected version' or 'I will proofread'. "
+        "Just output the fixed text directly. Keep the same meaning and length."
     )
-    user = f"Question: {question}\n\nAnswer to check:\n{answer}\n\nCorrected version:"
+    user = f"{answer}"
 
     result = _gen(model, tokenizer, sys_msg, user, max_tokens=180)
 
