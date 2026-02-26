@@ -2,7 +2,18 @@
 ScholarMind Terminal Chatbot
 Interactive research assistant powered by Phi-3 + FAISS knowledge base.
 """
+# Suppress all noisy warnings before imports
+import warnings
+warnings.filterwarnings("ignore")
 import os
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import logging
+logging.getLogger("transformers").setLevel(logging.ERROR)
+logging.getLogger("accelerate").setLevel(logging.ERROR)
+logging.getLogger("bitsandbytes").setLevel(logging.ERROR)
+logging.getLogger("peft").setLevel(logging.ERROR)
+
 import sys
 import glob
 import time
