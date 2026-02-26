@@ -12,6 +12,9 @@ from agents.evaluator import EvaluatorAgent
 from agents.self_improvement import SelfImprovementAgent
 from agents.orchestrator import OrchestratorAgent
 from agents.rag_pipeline import RAGPipeline
+from agents.custom_trainer import CustomTrainerAgent
+from agents.distillation import DistillationAgent
+from agents.comparison import ComparisonAgent
 
 __all__ = [
     'ExtractorAgent',
@@ -22,5 +25,8 @@ __all__ = [
     'EvaluatorAgent',
     'SelfImprovementAgent',
     'OrchestratorAgent',
-    'RAGPipeline'
+    'RAGPipeline',
+    'CustomTrainerAgent',
+    'DistillationAgent',
+    'ComparisonAgent',
 ]

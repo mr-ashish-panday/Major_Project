@@ -72,4 +72,22 @@ CONFIG = {
     'min_bleu_target': 0.05,         # Minimum acceptable BLEU
     'min_rouge_target': 0.15,        # Minimum acceptable ROUGE-L
     'perplexity_improvement_target': 0.1,  # 10% improvement target
+    
+    # ===========================================
+    # SCHOLARFORMER CUSTOM MODEL CONFIG
+    # ===========================================
+    'scholarformer_dir': './models/scholarformer',
+    'scholarformer_checkpoint_dir': './models/scholarformer/checkpoints',
+    'scholarformer_hidden_dim': 768,
+    'scholarformer_num_layers': 12,
+    'scholarformer_num_heads': 12,
+    'scholarformer_ffn_dim': 2048,
+    'scholarformer_vocab_size': 32000,
+    'scholarformer_max_seq_len': 1024,
+    'scholarformer_retrieval_heads': 4,
+    
+    # Comparison / Battle Dashboard
+    'comparison_mode': True,
+    'comparison_output_dir': './logs/comparisons',
+    'comparison_max_test_chunks': 30,
 }
