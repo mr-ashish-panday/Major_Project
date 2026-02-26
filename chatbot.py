@@ -1,6 +1,6 @@
 """
 ScholarMind Terminal Chatbot
-Interactive research assistant powered by Phi-3 + FAISS knowledge base.
+Two-pass approach: Model answer + Model-formatted research evidence.
 """
 # Suppress all noisy warnings before imports
 import warnings
@@ -76,16 +76,17 @@ def load_system():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # Load fine-tuned LoRA adapter (56 autonomous training cycles)
+    print("done")
+
+    # Load fine-tuned LoRA adapter
     adapters = sorted(glob.glob("models/fine_tuned_*"))
     if adapters:
         adapter_path = adapters[-1]
         print(f"  Loading LoRA adapter: {os.path.basename(adapter_path)}...", end=" ", flush=True)
-        from peft import PeftModel
         model = PeftModel.from_pretrained(model, adapter_path)
         print("done")
 
-    print(f"  Total load time: {time.time() - t0:.1f}s")
+    print(f"  Ready in {time.time() - t0:.1f}s")
     print()
     print("  Type your question and press Enter.")
     print("  Type 'quit' or 'exit' to stop.")
@@ -94,18 +95,11 @@ def load_system():
     return model, tokenizer, vector_store
 
 
-def generate_answer(model, tokenizer, question):
-    """Generate a clean answer from Phi-3."""
+def generate(model, tokenizer, system_msg, user_msg, max_tokens=120):
+    """Generate response with given system/user messages."""
     prompt = (
-        SYS + "\n"
-        "You are ScholarMind, an AI research assistant that ONLY answers questions "
-        "about artificial intelligence, machine learning, deep learning, NLP, "
-        "transformers, LLMs, and related computer science research topics. "
-        "If the user asks about anything unrelated to AI/ML research, politely decline "
-        "and say you can only help with AI and ML research questions. "
-        "Keep answers concise, accurate, and under 100 words. "
-        "End with a complete sentence." + END + "\n"
-        + USR + "\n" + question + END + "\n"
+        SYS + "\n" + system_msg + END + "\n"
+        + USR + "\n" + user_msg + END + "\n"
         + AST + "\n"
     )
 
@@ -113,11 +107,10 @@ def generate_answer(model, tokenizer, question):
         prompt, return_tensors="pt", truncation=True, max_length=2048
     ).to(model.device)
 
-    t0 = time.time()
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=120,
+            max_new_tokens=max_tokens,
             temperature=0.2,
             top_p=0.8,
             top_k=30,
@@ -126,40 +119,79 @@ def generate_answer(model, tokenizer, question):
             no_repeat_ngram_size=3,
             pad_token_id=tokenizer.pad_token_id,
         )
-    latency = time.time() - t0
 
     generated = outputs[0][inputs["input_ids"].shape[1]:]
     answer = tokenizer.decode(generated, skip_special_tokens=True).strip()
 
-    # Trim at last complete sentence to avoid cut-off gibberish
+    # Trim at last complete sentence
     if answer and answer[-1] not in ".!?":
         last_end = max(answer.rfind("."), answer.rfind("!"), answer.rfind("?"))
-        if last_end > 20:  # Keep at least 20 chars
+        if last_end > 20:
             answer = answer[:last_end + 1]
 
-    return answer, latency
+    return answer
 
 
-def find_related_papers(vector_store, question, top_k=3):
-    """Find related papers from the knowledge base."""
+def pass1_conceptual_answer(model, tokenizer, question):
+    """Pass 1: Get a clean conceptual answer."""
+    system = (
+        "You are ScholarMind, an AI research assistant that ONLY answers questions "
+        "about artificial intelligence, machine learning, deep learning, NLP, "
+        "transformers, LLMs, and related computer science research topics. "
+        "If the question is unrelated to AI/ML, politely decline. "
+        "Give a clear, concise explanation in 2-3 sentences maximum."
+    )
+    return generate(model, tokenizer, system, question, max_tokens=100)
+
+
+def pass2_format_evidence(model, tokenizer, question, paper_snippets):
+    """Pass 2: Format paper excerpts into clean research evidence."""
+    system = (
+        "You are a research paper summarizer. "
+        "Given paper excerpts related to a question, write 2-3 clean bullet points "
+        "summarizing what the research says. Start each point with the paper number like [1], [2]. "
+        "Be concise - one sentence per point. Only state facts from the excerpts."
+    )
+
+    user = (
+        f"Question: {question}\n\n"
+        f"Paper excerpts:\n{paper_snippets}\n\n"
+        "Summarize the key research findings in 2-3 bullet points:"
+    )
+    return generate(model, tokenizer, system, user, max_tokens=120)
+
+
+def search_papers(vector_store, question, top_k=3):
+    """Search knowledge base and return papers + snippets."""
     results = vector_store.search(question, top_k=top_k)
     papers = []
-    seen_titles = set()
+    snippets = []
+    seen = set()
+
     for doc in results:
         meta = doc.get("metadata", {})
         title = meta.get("title", "Unknown")
-        if title in seen_titles:
+        if title in seen:
             continue
-        seen_titles.add(title)
+        seen.add(title)
+        score = doc.get("score", 0)
+        if score < 0.35:
+            continue
+
+        idx = len(papers) + 1
+        content = doc.get("content", "")[:300].replace("\n", " ").strip()
         papers.append({
+            "id": idx,
             "title": title,
             "authors": meta.get("authors", "Unknown"),
-            "score": doc.get("score", 0),
+            "score": score,
         })
-    return papers
+        snippets.append(f"[{idx}] From '{title}': {content}")
+
+    return papers, "\n\n".join(snippets)
 
 
-def wrap_text(text, width=70, indent=2):
+def wrap_text(text, width=70, indent=4):
     """Word-wrap text for terminal display."""
     prefix = " " * indent
     words = text.split()
@@ -193,23 +225,36 @@ def main():
             print("\n  Goodbye!\n")
             break
 
-        # Generate answer
+        # === PASS 1: Conceptual Answer ===
         print()
         print("  Thinking...", end="\r", flush=True)
-        answer, latency = generate_answer(model, tokenizer, question)
+        t0 = time.time()
+        answer = pass1_conceptual_answer(model, tokenizer, question)
+        t1 = time.time()
 
-        print(f"  ScholarMind ({latency:.1f}s):")
+        print(f"  ScholarMind ({t1 - t0:.1f}s):")
         print()
         print(wrap_text(answer))
 
-        # Find related papers (only show if relevance > 35%)
-        papers = find_related_papers(vector_store, question, top_k=3)
-        relevant = [p for p in papers if p["score"] > 0.35]
-        if relevant:
+        # === SEARCH: Find related papers ===
+        papers, snippets = search_papers(vector_store, question)
+
+        if papers and snippets:
+            # === PASS 2: Format paper evidence ===
             print()
-            print("  Related Papers:")
-            for i, p in enumerate(relevant, 1):
-                print(f"    [{i}] {p['title']}")
+            print("  Checking research papers...", end="\r", flush=True)
+            evidence = pass2_format_evidence(model, tokenizer, question, snippets)
+            t2 = time.time()
+
+            print(f"  Research Evidence ({t2 - t1:.1f}s):")
+            print()
+            print(wrap_text(evidence))
+
+            # Show source papers
+            print()
+            print("  Sources:")
+            for p in papers:
+                print(f"    [{p['id']}] {p['title']}")
                 print(f"        by {p['authors']} ({p['score']:.0%} match)")
 
         print()
