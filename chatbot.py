@@ -1,8 +1,9 @@
 """
-ScholarMind Terminal Chatbot - Smart Router
+ScholarMind Terminal Chatbot - Smart Router v2
 Routes questions:
   SIMPLE ("what is X?") → base model answers directly (clean, accurate)
   RESEARCH ("latest findings in X?") → trained model + RAG + verify pipeline
+Features: conversation memory, response cache, question expansion, smart prefixes
 """
 # === SUPPRESS ALL WARNINGS ===
 import warnings
@@ -15,7 +16,8 @@ os.environ["PYTHONWARNINGS"] = "ignore"
 import logging
 logging.disable(logging.WARNING)
 
-import sys, glob, time, threading, io, torch
+import sys, glob, time, threading, io, torch, hashlib
+from collections import OrderedDict
 
 _stderr = sys.stderr
 sys.stderr = io.StringIO()
@@ -42,6 +44,25 @@ RESEARCH_KEYWORDS = [
     "2026", "published", "paper", "study", "compare", "benchmark",
     "outperform", "improve upon", "better than", "challenge",
 ]
+
+# Synonyms for question expansion (better RAG retrieval)
+EXPANSION_MAP = {
+    "llm": "large language model GPT BERT transformer",
+    "lora": "low-rank adaptation parameter efficient fine-tuning PEFT",
+    "rag": "retrieval augmented generation knowledge base vector search",
+    "nlp": "natural language processing text understanding sentiment",
+    "transformer": "self-attention encoder decoder BERT GPT architecture",
+    "fine-tuning": "transfer learning adaptation domain-specific training",
+    "distillation": "knowledge distillation teacher student model compression",
+    "attention": "self-attention multi-head attention mechanism transformer",
+    "embedding": "vector representation word2vec semantic space",
+    "quantization": "model compression 4-bit 8-bit inference optimization",
+    "rlhf": "reinforcement learning human feedback alignment reward model",
+    "diffusion": "diffusion model denoising generative image synthesis",
+    "gan": "generative adversarial network discriminator generator",
+    "cnn": "convolutional neural network image classification vision",
+    "rnn": "recurrent neural network LSTM GRU sequence modeling",
+}
 
 
 def thinking_animation(stop_event):
@@ -248,28 +269,92 @@ def _get_prefix(question):
     """Generate a correct output prefix to guide the model's start."""
     q = question.lower().strip().rstrip('?').strip()
     prefixes = {
+        # Core concepts
         "what is llm": "A Large Language Model (LLM) is",
-        "what is lora": "Low-Rank Adaptation (LoRA) is",
         "what is an llm": "A Large Language Model (LLM) is",
+        "what is lora": "Low-Rank Adaptation (LoRA) is",
+        "what is qlora": "QLoRA (Quantized Low-Rank Adaptation) is",
+        "what is peft": "Parameter-Efficient Fine-Tuning (PEFT) is",
+        # Architectures
         "explain transformers": "Transformers are",
         "what is transformer": "A Transformer is",
+        "what are transformers": "Transformers are",
         "what is attention mechanism": "The attention mechanism is",
         "what is attention": "The attention mechanism is",
-        "what is fine-tuning": "Fine-tuning is",
-        "what is fine tuning": "Fine-tuning is",
-        "what is knowledge distillation": "Knowledge distillation is",
-        "what is nlp": "Natural Language Processing (NLP) is",
-        "what is deep learning": "Deep learning is",
-        "what is neural network": "A neural network is",
+        "what is self-attention": "Self-attention is",
+        "what is multi-head attention": "Multi-head attention is",
+        # Models
         "what is bert": "BERT (Bidirectional Encoder Representations from Transformers) is",
         "what is gpt": "GPT (Generative Pre-trained Transformer) is",
+        "what is gpt-4": "GPT-4 is",
+        "what is llama": "LLaMA (Large Language Model Meta AI) is",
+        "what is mistral": "Mistral is",
+        "what is phi": "Phi is",
+        "what is gemini": "Gemini is",
+        "what is claude": "Claude is",
+        "what is t5": "T5 (Text-to-Text Transfer Transformer) is",
+        # Techniques
+        "what is fine-tuning": "Fine-tuning is",
+        "what is fine tuning": "Fine-tuning is",
+        "what is transfer learning": "Transfer learning is",
+        "what is knowledge distillation": "Knowledge distillation is",
         "what is rag": "Retrieval-Augmented Generation (RAG) is",
+        "what is rlhf": "Reinforcement Learning from Human Feedback (RLHF) is",
+        "what is dpo": "Direct Preference Optimization (DPO) is",
+        "what is quantization": "Quantization is",
+        "what is pruning": "Pruning is",
+        # Fundamentals
+        "what is nlp": "Natural Language Processing (NLP) is",
+        "what is deep learning": "Deep learning is",
+        "what is machine learning": "Machine learning is",
+        "what is neural network": "A neural network is",
         "what is embedding": "An embedding is",
+        "what is tokenization": "Tokenization is",
+        "what is backpropagation": "Backpropagation is",
+        "what is gradient descent": "Gradient descent is",
+        "what is batch normalization": "Batch normalization is",
+        "what is dropout": "Dropout is",
+        "what is overfitting": "Overfitting is",
+        "what is underfitting": "Underfitting is",
+        "what is regularization": "Regularization is",
+        # Vision & generative
+        "what is cnn": "A Convolutional Neural Network (CNN) is",
+        "what is gan": "A Generative Adversarial Network (GAN) is",
+        "what is diffusion model": "A diffusion model is",
+        "what is stable diffusion": "Stable Diffusion is",
+        "what is vae": "A Variational Autoencoder (VAE) is",
+        "what is autoencoder": "An autoencoder is",
+        # Sequence models
+        "what is rnn": "A Recurrent Neural Network (RNN) is",
+        "what is lstm": "Long Short-Term Memory (LSTM) is",
+        # Training
+        "what is catastrophic forgetting": "Catastrophic forgetting is",
+        "what is continual learning": "Continual learning is",
+        "what is curriculum learning": "Curriculum learning is",
+        "what is few-shot learning": "Few-shot learning is",
+        "what is zero-shot learning": "Zero-shot learning is",
+        "what is prompt engineering": "Prompt engineering is",
+        "what is in-context learning": "In-context learning is",
+        "what is chain of thought": "Chain-of-thought prompting is",
+        # Data
+        "what is data augmentation": "Data augmentation is",
+        "what is synthetic data": "Synthetic data is",
+        "what is vector database": "A vector database is",
     }
     for key, val in prefixes.items():
         if key in q:
             return val
     return ""
+
+
+def _expand_query(question):
+    """Expand question with synonyms for better RAG retrieval."""
+    q_lower = question.lower()
+    expansions = [question]
+    for term, synonyms in EXPANSION_MAP.items():
+        if term in q_lower:
+            expansions.append(synonyms)
+    return " ".join(expansions)
 
 
 # ============================================================
@@ -288,8 +373,9 @@ def research_draft(model, tok, question):
 
 
 def search_papers(vs, question):
-    """RAG search."""
-    results = vs.search(question, top_k=3)
+    """RAG search with question expansion for better retrieval."""
+    expanded = _expand_query(question)
+    results = vs.search(expanded, top_k=3)
     papers, evidence = [], []
     seen = set()
     for doc in results:
@@ -299,10 +385,11 @@ def search_papers(vs, question):
             continue
         seen.add(title)
         idx = len(papers) + 1
+        score = doc.get("score", 0)
         content = doc.get("content", "")[:200].replace("\n", " ").strip()
         papers.append({"id": idx, "title": title,
                         "authors": meta.get("authors", "Unknown"),
-                        "score": doc.get("score", 0)})
+                        "score": round(score * 100)})
         evidence.append(f"[{idx}] {title}: {content}")
     return papers, "\n".join(evidence)
 
@@ -342,8 +429,78 @@ def wrap_text(text, width=68, indent=4):
     return "\n".join(lines)
 
 
+# ============================================================
+# Response cache for instant repeats
+# ============================================================
+class ResponseCache:
+    """LRU cache for chatbot responses."""
+    def __init__(self, maxsize=50):
+        self._cache = OrderedDict()
+        self._maxsize = maxsize
+
+    def _key(self, question):
+        q = question.lower().strip().rstrip('?!. ')
+        return hashlib.md5(q.encode()).hexdigest()
+
+    def get(self, question):
+        k = self._key(question)
+        if k in self._cache:
+            self._cache.move_to_end(k)
+            return self._cache[k]
+        return None
+
+    def put(self, question, answer, papers, route):
+        k = self._key(question)
+        self._cache[k] = (answer, papers, route)
+        if len(self._cache) > self._maxsize:
+            self._cache.popitem(last=False)
+
+
+# ============================================================
+# Conversation memory for follow-up questions
+# ============================================================
+class ConversationMemory:
+    """Keeps last N turns for context."""
+    def __init__(self, max_turns=5):
+        self.history = []  # list of (question, answer)
+        self.max_turns = max_turns
+
+    def add(self, question, answer):
+        self.history.append((question, answer))
+        if len(self.history) > self.max_turns:
+            self.history.pop(0)
+
+    def get_context(self):
+        """Return conversation context string."""
+        if not self.history:
+            return ""
+        lines = []
+        for q, a in self.history[-3:]:  # last 3 turns max
+            lines.append(f"User asked: {q}")
+            lines.append(f"You answered: {a[:100]}...")
+        return "\n".join(lines)
+
+    def is_followup(self, question):
+        """Detect if question is a follow-up."""
+        followup_words = ["tell me more", "elaborate", "explain more",
+                          "what about", "how about", "and ", "also",
+                          "why", "can you explain", "more detail",
+                          "what else", "continue", "go on"]
+        q_lower = question.lower()
+        return any(fw in q_lower for fw in followup_words) and len(self.history) > 0
+
+    def expand_followup(self, question):
+        """Expand a follow-up question with context from last turn."""
+        if not self.history:
+            return question
+        last_q, last_a = self.history[-1]
+        return f"{question} (context: previously discussed {last_q})"
+
+
 def main():
     model, tok, vs = load_system()
+    cache = ResponseCache()
+    memory = ConversationMemory()
 
     while True:
         print()
@@ -358,37 +515,58 @@ def main():
             print("\n  Goodbye!\n")
             break
 
+        # Check cache first
+        cached = cache.get(question)
+        if cached:
+            final, papers, route = cached
+            print(f"  ScholarMind (cached) [{route}]:\n")
+            print(wrap_text(final))
+            if papers:
+                print()
+                print("  References:")
+                for p in papers:
+                    score_str = f" ({p['score']}%)"
+                    print(f"    [{p['id']}] {p['title']}{score_str}")
+                    print(f"        {p['authors']}")
+            print()
+            print("  " + "-" * 56)
+            memory.add(question, final)
+            continue
+
+        # Expand follow-up questions with context
+        effective_question = question
+        if memory.is_followup(question):
+            effective_question = memory.expand_followup(question)
+
         stop = threading.Event()
         anim = threading.Thread(target=thinking_animation, args=(stop,), daemon=True)
         anim.start()
         t0 = time.time()
 
-        is_research = is_research_question(question)
+        is_research = is_research_question(effective_question)
         papers = []
 
         # Generate answer (with retry if validation fails)
         for attempt in range(2):
             if is_research:
                 # RESEARCH PATH: trained model draft → RAG → combine
-                draft = research_draft(model, tok, question)
-                papers, evidence = search_papers(vs, question)
-                final = research_combine(model, tok, question, draft, evidence)
+                draft = research_draft(model, tok, effective_question)
+                papers, evidence = search_papers(vs, effective_question)
+                final = research_combine(model, tok, effective_question, draft, evidence)
             else:
                 # SIMPLE PATH: base model answers directly
-                final = answer_simple(model, tok, question)
+                final = answer_simple(model, tok, effective_question)
 
             # Validate answer
-            is_ok, reason = _validate_answer(final, question)
+            is_ok, reason = _validate_answer(final, effective_question)
             if is_ok:
                 break
             # If failed and first attempt, retry with stricter prompt
             if attempt == 0 and reason in ("off_topic", "garbled", "too_short"):
                 if not is_research:
-                    # Try research path instead
                     is_research = True
                     continue
                 else:
-                    # Retry with same path
                     continue
 
         stop.set()
@@ -403,11 +581,16 @@ def main():
             print()
             print("  References:")
             for p in papers:
-                print(f"    [{p['id']}] {p['title']}")
+                score_str = f" ({p['score']}%)"
+                print(f"    [{p['id']}] {p['title']}{score_str}")
                 print(f"        {p['authors']}")
 
         print()
         print("  " + "-" * 56)
+
+        # Save to cache and memory
+        cache.put(question, final, papers, route)
+        memory.add(question, final)
 
 
 if __name__ == "__main__":
