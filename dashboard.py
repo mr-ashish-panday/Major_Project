@@ -401,7 +401,10 @@ with tab_chat:
         if msg['role'] == 'user':
             st.markdown(f'<div class="user-message">🧑‍💻 {msg["content"]}</div>', unsafe_allow_html=True)
         else:
-            st.markdown(f'<div class="assistant-message">🤖 {msg["content"]}{msg.get("citations_html", "")}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="assistant-message">🤖 {msg["content"]}</div>', unsafe_allow_html=True)
+            # Render citations separately so inner HTML is not escaped
+            if msg.get("citations_html"):
+                st.markdown(msg["citations_html"], unsafe_allow_html=True)
 
     # Input
     with st.form(key="query_form", clear_on_submit=True):
