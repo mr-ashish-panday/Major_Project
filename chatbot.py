@@ -399,10 +399,16 @@ def research_combine(model, tok, question, draft, evidence):
     sys_msg = (
         "You received a research draft and paper excerpts about AI/ML. "
         "Write a polished answer combining the key findings. "
+        "IMPORTANT acronyms: LLM=Large Language Model, LoRA=Low-Rank Adaptation, "
+        "NLP=Natural Language Processing, PEFT=Parameter-Efficient Fine-Tuning, "
+        "RLHF=Reinforcement Learning from Human Feedback, RAG=Retrieval-Augmented Generation, "
+        "GAN=Generative Adversarial Network, CNN=Convolutional Neural Network, "
+        "RNN=Recurrent Neural Network, BERT=Bidirectional Encoder Representations from Transformers, "
+        "GPT=Generative Pre-trained Transformer. Fix any wrong expansions in the draft. "
         "Structure: First state the research topic. Then describe 1-2 key findings from the papers. "
         "Then mention the significance. "
         "Include citations [1], [2] when referencing specific papers. "
-        "Fix any factual errors. Write 3-4 grammatically perfect sentences."
+        "Write 3-4 grammatically perfect sentences."
     )
     user = (
         f"Question: {question}\n\n"
