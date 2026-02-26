@@ -1,10 +1,8 @@
 """
-ScholarMind Terminal Chatbot
-Pipeline:
-  Step 1: Trained model generates domain answer (has latest research knowledge)
-  Step 2: RAG retrieves relevant paper evidence
-  Step 3: Model checks the draft, corrects errors, combines with paper knowledge
-  Step 4: Model does final verification pass on the combined answer
+ScholarMind Terminal Chatbot - Smart Router
+Routes questions:
+  SIMPLE ("what is X?") → base model answers directly (clean, accurate)
+  RESEARCH ("latest findings in X?") → trained model + RAG + verify pipeline
 """
 # === SUPPRESS ALL WARNINGS ===
 import warnings
@@ -36,6 +34,15 @@ END = "<" + "|end|" + ">"
 USR = "<" + "|user|" + ">"
 AST = "<" + "|assistant|" + ">"
 
+# Keywords that indicate a RESEARCH question (needs trained model + RAG)
+RESEARCH_KEYWORDS = [
+    "latest", "recent", "new", "advancement", "finding", "discover",
+    "state of the art", "sota", "breakthrough", "cutting edge",
+    "trend", "emerging", "novel", "current research", "2024", "2025",
+    "2026", "published", "paper", "study", "compare", "benchmark",
+    "outperform", "improve upon", "better than", "challenge",
+]
+
 
 def thinking_animation(stop_event):
     frames = ["  Thinking.  ", "  Thinking.. ", "  Thinking..."]
@@ -45,6 +52,15 @@ def thinking_animation(stop_event):
         i += 1
         time.sleep(0.4)
     print("\r" + " " * 20 + "\r", end="", flush=True)
+
+
+def is_research_question(question):
+    """Route: is this a research question or a simple definition?"""
+    q_lower = question.lower()
+    for kw in RESEARCH_KEYWORDS:
+        if kw in q_lower:
+            return True
+    return False
 
 
 def load_system():
@@ -96,8 +112,8 @@ def load_system():
     return model, tok, vs
 
 
-def _gen(model, tok, system, user, max_tokens=150):
-    """Deterministic generation - no sampling, consistent output."""
+def _gen(model, tok, system, user, max_tokens=150, use_adapter=True):
+    """Generate text. use_adapter=False tries context manager to disable adapter."""
     prompt = (SYS + "\n" + system + END + "\n"
               + USR + "\n" + user + END + "\n"
               + AST + "\n")
@@ -106,15 +122,24 @@ def _gen(model, tok, system, user, max_tokens=150):
 
     old = sys.stderr
     sys.stderr = io.StringIO()
+
+    gen_kwargs = dict(
+        **inputs,
+        max_new_tokens=max_tokens,
+        do_sample=False,
+        repetition_penalty=1.3,
+        no_repeat_ngram_size=4,
+        pad_token_id=tok.pad_token_id,
+    )
+
     with torch.no_grad():
-        out = model.generate(
-            **inputs,
-            max_new_tokens=max_tokens,
-            do_sample=False,           # DETERMINISTIC - no randomness
-            repetition_penalty=1.3,
-            no_repeat_ngram_size=4,
-            pad_token_id=tok.pad_token_id,
-        )
+        if not use_adapter and hasattr(model, 'disable_adapter'):
+            # Use context manager to cleanly disable adapter
+            with model.disable_adapter():
+                out = model.generate(**gen_kwargs)
+        else:
+            out = model.generate(**gen_kwargs)
+
     sys.stderr = old
 
     gen = out[0][inputs["input_ids"].shape[1]:]
@@ -126,10 +151,8 @@ def _clean(text):
     """Strip meta-commentary and artifacts."""
     if not text:
         return text
-    # Remove code fences
     text = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
     text = text.replace('```', '')
-    # Remove proofreading meta-commentary
     for p in [
         r"Here'?t?\s*be\s+any\s+spelled.*?(?:here you go\s*:?\s*)",
         r"(?:I will|Let me|I have)\s+(?:proofread|check|review|correct).*?(?::\s*|\.\.\.+\s*)",
@@ -139,11 +162,8 @@ def _clean(text):
         r"^.*?here you go\s*:?\s*", r"I hope (?:this|that).*$",
     ]:
         text = re.sub(p, '', text, flags=re.IGNORECASE | re.DOTALL)
-    # Remove emoji/non-ascii
     text = re.sub(r'[^\x00-\x7F]+', '', text)
-    # Clean whitespace
     text = re.sub(r'\s+', ' ', text).strip()
-    # Trim at last sentence
     if text and text[-1] not in ".!?":
         last = max(text.rfind("."), text.rfind("!"), text.rfind("?"))
         if last > 20:
@@ -152,20 +172,36 @@ def _clean(text):
 
 
 # ============================================================
-# STEP 1: Trained model generates domain draft
+# SIMPLE PATH: Base model answers directly (adapter OFF)
 # ============================================================
-def step1_domain_draft(model, tok, question):
-    return _gen(model, tok,
-        "You are an AI research expert. Answer concisely about AI, ML, "
-        "deep learning, NLP, transformers, LLMs. If not AI/ML topic, "
-        "say: I only answer AI/ML research questions.",
-        question, max_tokens=100)
+def answer_simple(model, tok, question):
+    """For simple definition questions - clean base model answer."""
+    sys_msg = (
+        "You are ScholarMind, an AI research assistant. "
+        "Give a clear, accurate, and concise answer about AI/ML topics. "
+        "If the question is not about AI/ML, politely decline. "
+        "Write 2-3 sentences with perfect grammar."
+    )
+    return _gen(model, tok, sys_msg, question,
+                max_tokens=120, use_adapter=False)
 
 
 # ============================================================
-# STEP 2: RAG search
+# RESEARCH PATH: Trained model + RAG + combine
 # ============================================================
-def step2_papers(vs, question):
+def research_draft(model, tok, question):
+    """Trained model generates research-informed draft."""
+    sys_msg = (
+        "You are an AI research expert trained on scientific papers. "
+        "Answer about latest findings, developments, and research in AI/ML. "
+        "Be specific and mention relevant techniques or methods."
+    )
+    return _gen(model, tok, sys_msg, question,
+                max_tokens=100, use_adapter=True)
+
+
+def search_papers(vs, question):
+    """RAG search."""
     results = vs.search(question, top_k=3)
     papers, evidence = [], []
     seen = set()
@@ -184,47 +220,22 @@ def step2_papers(vs, question):
     return papers, "\n".join(evidence)
 
 
-# ============================================================
-# STEP 3: Check draft, correct errors, combine with papers
-# ============================================================
-def step3_correct_and_combine(model, tok, question, draft, evidence, has_papers):
-    if has_papers:
-        sys_msg = (
-            "You received a draft answer and research paper excerpts. "
-            "Your job: check the draft for factual errors, fix any wrong terms, "
-            "and write a correct, combined answer. Use paper information if the "
-            "question asks about latest findings or developments. "
-            "For simple definitions, just give the correct answer. "
-            "Write 3-4 clean sentences. No meta-commentary."
-        )
-        user = (
-            f"Question: {question}\n\n"
-            f"Draft (may have errors - fix them):\n{draft}\n\n"
-            f"Papers:\n{evidence}\n\n"
-            f"Corrected answer:"
-        )
-    else:
-        sys_msg = (
-            "Check this draft for errors and rewrite correctly. "
-            "Write 3-4 clean sentences. No meta-commentary."
-        )
-        user = f"Question: {question}\n\nDraft:\n{draft}\n\nCorrected answer:"
-    return _gen(model, tok, sys_msg, user, max_tokens=150)
-
-
-# ============================================================
-# STEP 4: Final verification - ensure quality
-# ============================================================
-def step4_verify(model, tok, question, answer):
+def research_combine(model, tok, question, draft, evidence):
+    """Combine draft + paper evidence into final research answer."""
     sys_msg = (
-        "Verify this answer is factually correct and grammatically clean. "
-        "Fix any remaining errors. Output ONLY the final answer text. "
-        "No commentary, no notes, no 'here is the corrected version'. "
-        "Just the answer itself."
+        "You received a research draft and paper excerpts. "
+        "Write a clean answer combining the key findings. "
+        "Include citations [1], [2] when referencing papers. "
+        "Fix any errors in the draft. Write 3-4 clear sentences."
     )
-    return _gen(model, tok, sys_msg,
-        f"Question: {question}\n\nAnswer: {answer}\n\nVerified answer:",
-        max_tokens=150)
+    user = (
+        f"Question: {question}\n\n"
+        f"Research draft:\n{draft}\n\n"
+        f"Papers:\n{evidence}\n\n"
+        f"Combined answer with citations:"
+    )
+    return _gen(model, tok, sys_msg, user,
+                max_tokens=150, use_adapter=False)
 
 
 def wrap_text(text, width=68, indent=4):
@@ -263,24 +274,24 @@ def main():
         anim.start()
         t0 = time.time()
 
-        # STEP 1: Domain draft from trained model
-        draft = step1_domain_draft(model, tok, question)
+        is_research = is_research_question(question)
 
-        # STEP 2: Find papers
-        papers, evidence = step2_papers(vs, question)
-
-        # STEP 3: Correct errors + combine with paper knowledge
-        combined = step3_correct_and_combine(
-            model, tok, question, draft, evidence, len(papers) > 0)
-
-        # STEP 4: Final verification pass
-        final = step4_verify(model, tok, question, combined)
+        if is_research:
+            # RESEARCH PATH: trained model draft → RAG → combine
+            draft = research_draft(model, tok, question)
+            papers, evidence = search_papers(vs, question)
+            final = research_combine(model, tok, question, draft, evidence)
+        else:
+            # SIMPLE PATH: base model answers directly
+            final = answer_simple(model, tok, question)
+            papers = []
 
         stop.set()
         anim.join()
         latency = time.time() - t0
 
-        print(f"  ScholarMind ({latency:.1f}s):\n")
+        route = "Research" if is_research else "Direct"
+        print(f"  ScholarMind ({latency:.1f}s) [{route}]:\n")
         print(wrap_text(final))
 
         if papers:
