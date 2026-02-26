@@ -1,8 +1,6 @@
 """
-ScholarMind Terminal Chatbot - Three-Pass Pipeline
-Step 1: Fine-tuned model generates domain answer
-Step 2: RAG retrieves latest paper evidence
-Step 3: Base model combines both into polished final answer
+ScholarMind Terminal Chatbot
+Clean research assistant powered by fine-tuned Phi-3 + 20,818 papers.
 """
 # Suppress ALL warnings
 import warnings
@@ -13,12 +11,14 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import logging
 for name in ["transformers", "accelerate", "bitsandbytes", "peft", "torch",
-             "transformers.generation", "transformers.modeling_utils"]:
+             "transformers.generation", "transformers.modeling_utils",
+             "transformers.tokenization_utils_base"]:
     logging.getLogger(name).setLevel(logging.CRITICAL)
 
 import sys
 import glob
 import time
+import threading
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from peft import PeftModel
@@ -36,12 +36,23 @@ USR = "<" + "|user|" + ">"
 AST = "<" + "|assistant|" + ">"
 
 
+def thinking_animation(stop_event):
+    """Show animated thinking dots."""
+    frames = ["  Thinking.  ", "  Thinking.. ", "  Thinking..."]
+    i = 0
+    while not stop_event.is_set():
+        print(f"\r{frames[i % 3]}", end="", flush=True)
+        i += 1
+        time.sleep(0.5)
+    print("\r" + " " * 20 + "\r", end="", flush=True)
+
+
 def load_system():
     """Load all components."""
     print()
     print("=" * 60)
     print("  ScholarMind - AI Research Assistant")
-    print("  Powered by Fine-tuned Phi-3 + 20,818 Research Papers")
+    print("  Fine-tuned Phi-3 + 20,818 Research Papers")
     print("=" * 60)
 
     # Vector store
@@ -50,8 +61,8 @@ def load_system():
     stats = vector_store.get_stats()
     print(f"{stats.get('total_documents', 0)} documents")
 
-    # Phi-3 base
-    print("  Loading Phi-3 (4-bit)...", end=" ", flush=True)
+    # Phi-3
+    print("  Loading model...", end=" ", flush=True)
     t0 = time.time()
 
     bnb = BitsAndBytesConfig(
@@ -61,7 +72,7 @@ def load_system():
         bnb_4bit_use_double_quant=True,
     )
 
-    base_model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         "microsoft/Phi-3-mini-4k-instruct",
         quantization_config=bnb,
         device_map="auto",
@@ -78,32 +89,54 @@ def load_system():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    print("done")
-
     # Load fine-tuned adapter
-    model = base_model
     adapters = sorted(glob.glob("models/fine_tuned_*"))
     if adapters:
         adapter_path = adapters[-1]
-        print(f"  Loading LoRA adapter: {os.path.basename(adapter_path)}...", end=" ", flush=True)
-        model = PeftModel.from_pretrained(base_model, adapter_path)
-        print("done")
+        print(f"\n  Loading fine-tuned adapter ({os.path.basename(adapter_path)})...", end=" ", flush=True)
+        model = PeftModel.from_pretrained(model, adapter_path)
 
+    print("done")
     print(f"  Ready in {time.time() - t0:.1f}s")
     print()
-    print("  Ask any AI/ML research question. Type 'quit' to exit.")
+    print("  Ask any AI/ML research question.")
+    print("  Type 'quit' to exit.")
     print("=" * 60)
 
     return model, tokenizer, vector_store
 
 
-def generate(model, tokenizer, system_msg, user_msg, max_tokens=120):
-    """Generate response from model."""
+def generate_answer(model, tokenizer, question, paper_context=""):
+    """Generate a clean answer using retrieved paper context."""
+    if paper_context:
+        system = (
+            "You are ScholarMind, an expert AI research assistant. "
+            "Answer the question using the provided research paper excerpts. "
+            "Write a clear, well-structured answer with proper grammar. "
+            "Cite sources as [1], [2] when using information from papers. "
+            "If the question is not about AI/ML, politely decline. "
+            "Keep your answer to 3-4 sentences maximum."
+        )
+        user = (
+            f"Research papers:\n{paper_context}\n\n"
+            f"Question: {question}\n\n"
+            f"Answer clearly and cite sources:"
+        )
+    else:
+        system = (
+            "You are ScholarMind, an expert AI research assistant. "
+            "Give a clear, well-structured answer about AI/ML topics. "
+            "If the question is not about AI/ML, politely decline. "
+            "Keep your answer to 3-4 sentences maximum."
+        )
+        user = question
+
     prompt = (
-        SYS + "\n" + system_msg + END + "\n"
-        + USR + "\n" + user_msg + END + "\n"
+        SYS + "\n" + system + END + "\n"
+        + USR + "\n" + user + END + "\n"
         + AST + "\n"
     )
+
     inputs = tokenizer(
         prompt, return_tensors="pt", truncation=True, max_length=2048
     ).to(model.device)
@@ -111,7 +144,7 @@ def generate(model, tokenizer, system_msg, user_msg, max_tokens=120):
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=max_tokens,
+            max_new_tokens=150,
             temperature=0.2,
             top_p=0.8,
             top_k=30,
@@ -120,6 +153,7 @@ def generate(model, tokenizer, system_msg, user_msg, max_tokens=120):
             no_repeat_ngram_size=3,
             pad_token_id=tokenizer.pad_token_id,
         )
+
     generated = outputs[0][inputs["input_ids"].shape[1]:]
     answer = tokenizer.decode(generated, skip_special_tokens=True).strip()
 
@@ -128,24 +162,15 @@ def generate(model, tokenizer, system_msg, user_msg, max_tokens=120):
         last_end = max(answer.rfind("."), answer.rfind("!"), answer.rfind("?"))
         if last_end > 20:
             answer = answer[:last_end + 1]
+
     return answer
 
 
-def step1_domain_answer(model, tokenizer, question):
-    """STEP 1: Fine-tuned model generates domain-specific answer."""
-    system = (
-        "You are an AI research expert. Answer the question about AI, ML, "
-        "deep learning, NLP, or LLMs. Be specific and technical. "
-        "If the question is not about AI/ML, say: 'I only answer AI/ML research questions.'"
-    )
-    return generate(model, tokenizer, system, question, max_tokens=100)
-
-
-def step2_rag_search(vector_store, question):
-    """STEP 2: Search knowledge base for latest paper evidence."""
+def search_papers(vector_store, question):
+    """Search knowledge base for relevant papers."""
     results = vector_store.search(question, top_k=3)
     papers = []
-    snippets = []
+    context_parts = []
     seen = set()
 
     for doc in results:
@@ -155,53 +180,23 @@ def step2_rag_search(vector_store, question):
             continue
         seen.add(title)
         score = doc.get("score", 0)
-        if score < 0.35:
+        if score < 0.40:
             continue
 
         idx = len(papers) + 1
-        content = doc.get("content", "")[:300].replace("\n", " ").strip()
+        content = doc.get("content", "")[:250].replace("\n", " ").strip()
         papers.append({
             "id": idx,
             "title": title,
             "authors": meta.get("authors", "Unknown"),
             "score": score,
         })
-        snippets.append(f"[{idx}] {title}: {content}")
+        context_parts.append(f"[{idx}] {title}: {content}")
 
-    return papers, "\n".join(snippets)
-
-
-def step3_combine_and_polish(model, tokenizer, question, domain_answer, paper_evidence):
-    """STEP 3: Base model combines domain answer + paper evidence into polished output."""
-    # Disable adapter to use base model (better grammar/instruction following)
-    if hasattr(model, 'disable_adapter_layers'):
-        model.disable_adapter_layers()
-
-    system = (
-        "You are a professional research writer. You will be given a draft answer "
-        "and evidence from research papers. Combine them into ONE clear, well-written "
-        "paragraph with perfect grammar. Cite papers as [1], [2], [3]. "
-        "Do NOT add information beyond what is provided. "
-        "Write exactly one polished paragraph, no bullet points."
-    )
-
-    user = (
-        f"Question: {question}\n\n"
-        f"Draft answer: {domain_answer}\n\n"
-        f"Research evidence:\n{paper_evidence}\n\n"
-        f"Write one clear, polished paragraph combining the above:"
-    )
-
-    result = generate(model, tokenizer, system, user, max_tokens=150)
-
-    # Re-enable adapter
-    if hasattr(model, 'enable_adapter_layers'):
-        model.enable_adapter_layers()
-
-    return result
+    return papers, "\n".join(context_parts)
 
 
-def wrap_text(text, width=70, indent=4):
+def wrap_text(text, width=68, indent=4):
     """Word-wrap for terminal."""
     prefix = " " * indent
     words = text.split()
@@ -235,39 +230,36 @@ def main():
             print("\n  Goodbye!\n")
             break
 
-        t_start = time.time()
+        # Start thinking animation
+        stop = threading.Event()
+        anim = threading.Thread(target=thinking_animation, args=(stop,))
+        anim.start()
 
-        # === STEP 1: Fine-tuned domain answer ===
-        print("\n  [1/3] Generating domain answer...", end="\r", flush=True)
-        domain_answer = step1_domain_answer(model, tokenizer, question)
+        t0 = time.time()
 
-        # === STEP 2: RAG search ===
-        print("  [2/3] Searching 20,818 papers...   ", end="\r", flush=True)
-        papers, paper_evidence = step2_rag_search(vector_store, question)
+        # Search papers
+        papers, paper_context = search_papers(vector_store, question)
 
-        # === STEP 3: Combine & polish ===
-        if papers and paper_evidence:
-            print("  [3/3] Combining & polishing...     ", end="\r", flush=True)
-            final_answer = step3_combine_and_polish(
-                model, tokenizer, question, domain_answer, paper_evidence
-            )
-        else:
-            final_answer = domain_answer
+        # Generate answer
+        answer = generate_answer(model, tokenizer, question, paper_context)
 
-        total_time = time.time() - t_start
+        # Stop animation
+        stop.set()
+        anim.join()
 
-        # Display final answer
-        print(f"  ScholarMind ({total_time:.1f}s):              ")
-        print()
-        print(wrap_text(final_answer))
+        latency = time.time() - t0
+
+        # Display answer
+        print(f"  ScholarMind ({latency:.1f}s):\n")
+        print(wrap_text(answer))
 
         # Show sources
         if papers:
             print()
-            print("  Sources:")
+            print("  References:")
             for p in papers:
                 print(f"    [{p['id']}] {p['title']}")
-                print(f"        by {p['authors']} ({p['score']:.0%} match)")
+                print(f"        {p['authors']}")
 
         print()
         print("  " + "-" * 56)
