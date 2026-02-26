@@ -1,8 +1,11 @@
 """
-ScholarMind Terminal Chatbot
-Fine-tuned Phi-3 answers directly + papers shown as references.
+ScholarMind Terminal Chatbot - Smart Pipeline
+Step 1: Fine-tuned model generates domain answer (has research knowledge)
+Step 2: RAG retrieves latest paper evidence
+Step 3: Base model acts as SMART JUDGE - decides what info to use,
+        whether citations are needed, and produces final polished answer
 """
-# === AGGRESSIVE WARNING SUPPRESSION ===
+# === SUPPRESS ALL WARNINGS ===
 import warnings
 warnings.filterwarnings("ignore")
 import os
@@ -17,11 +20,9 @@ import sys
 import glob
 import time
 import threading
-import contextlib
 import io
 import torch
 
-# Redirect stderr during imports to catch C-level warnings
 _stderr = sys.stderr
 sys.stderr = io.StringIO()
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
@@ -42,7 +43,7 @@ AST = "<" + "|assistant|" + ">"
 
 
 def thinking_animation(stop_event):
-    """Show animated thinking dots."""
+    """Animated thinking dots."""
     frames = ["  Thinking.  ", "  Thinking.. ", "  Thinking..."]
     i = 0
     while not stop_event.is_set():
@@ -60,17 +61,15 @@ def load_system():
     print("  Fine-tuned Phi-3 + 20,818 Research Papers")
     print("=" * 60)
 
-    # Vector store
     print("\n  Loading knowledge base...", end=" ", flush=True)
     vector_store = VectorStoreAgent(CONFIG)
     stats = vector_store.get_stats()
     print(f"{stats.get('total_documents', 0)} documents")
 
-    # Load model with stderr suppressed
     print("  Loading model...", end=" ", flush=True)
     t0 = time.time()
 
-    old_stderr = sys.stderr
+    old_err = sys.stderr
     sys.stderr = io.StringIO()
 
     bnb = BitsAndBytesConfig(
@@ -97,12 +96,11 @@ def load_system():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # Load fine-tuned adapter
     adapters = sorted(glob.glob("models/fine_tuned_*"))
     if adapters:
         model = PeftModel.from_pretrained(model, adapters[-1])
 
-    sys.stderr = old_stderr
+    sys.stderr = old_err
     print(f"done ({time.time() - t0:.1f}s)")
     print()
     print("  Ask any AI/ML research question.")
@@ -112,21 +110,21 @@ def load_system():
     return model, tokenizer, vector_store
 
 
-def _generate(model, tokenizer, system, user, max_tokens=120):
-    """Core generation function."""
+def _gen(model, tokenizer, system, user, max_tokens=120):
+    """Core generation - stderr suppressed."""
     prompt = (
         SYS + "\n" + system + END + "\n"
         + USR + "\n" + user + END + "\n"
         + AST + "\n"
     )
     inputs = tokenizer(
-        prompt, return_tensors="pt", truncation=True, max_length=1024
+        prompt, return_tensors="pt", truncation=True, max_length=2048
     ).to(model.device)
 
-    old_stderr = sys.stderr
+    old = sys.stderr
     sys.stderr = io.StringIO()
     with torch.no_grad():
-        outputs = model.generate(
+        out = model.generate(
             **inputs,
             max_new_tokens=max_tokens,
             temperature=0.2,
@@ -137,56 +135,42 @@ def _generate(model, tokenizer, system, user, max_tokens=120):
             no_repeat_ngram_size=3,
             pad_token_id=tokenizer.pad_token_id,
         )
-    sys.stderr = old_stderr
+    sys.stderr = old
 
-    generated = outputs[0][inputs["input_ids"].shape[1]:]
-    answer = tokenizer.decode(generated, skip_special_tokens=True).strip()
+    gen = out[0][inputs["input_ids"].shape[1]:]
+    ans = tokenizer.decode(gen, skip_special_tokens=True).strip()
 
     # Trim at last complete sentence
-    if answer and answer[-1] not in ".!?":
-        last_end = max(answer.rfind("."), answer.rfind("!"), answer.rfind("?"))
-        if last_end > 20:
-            answer = answer[:last_end + 1]
-    return answer
+    if ans and ans[-1] not in ".!?":
+        last = max(ans.rfind("."), ans.rfind("!"), ans.rfind("?"))
+        if last > 20:
+            ans = ans[:last + 1]
+    return ans
 
 
-def step1_domain_answer(model, tokenizer, question):
-    """STEP 1: Fine-tuned model generates domain answer."""
+# ============================================================
+# STEP 1: Fine-tuned model (adapter ON) - domain answer
+# ============================================================
+def step1_finetuned_answer(model, tokenizer, question):
+    """Fine-tuned model generates answer using its domain knowledge."""
     system = (
-        "You are an AI research expert. Answer questions about AI, "
-        "machine learning, deep learning, NLP, transformers, and LLMs. "
-        "If the question is not about AI/ML, say: I only answer AI/ML questions. "
-        "Give a technical, informative answer."
+        "You are an AI research expert trained on scientific papers. "
+        "Answer the question about AI/ML/NLP/LLMs with technical accuracy. "
+        "If not about AI/ML, say: I only answer AI/ML research questions."
     )
-    return _generate(model, tokenizer, system, question, max_tokens=120)
+    return _gen(model, tokenizer, system, question, max_tokens=120)
 
 
-def step2_polish(model, tokenizer, question, draft):
-    """STEP 2: Base model (adapter OFF) reformats with proper grammar."""
-    if hasattr(model, 'disable_adapter_layers'):
-        model.disable_adapter_layers()
-
-    system = (
-        "You are a professional scientific writer. "
-        "Rewrite the following draft answer with perfect grammar, "
-        "clear structure, and proper punctuation. "
-        "Keep the same meaning and technical content. "
-        "Write 3-4 polished sentences. Do not add new information."
-    )
-    user = f"Question: {question}\n\nDraft answer to rewrite:\n{draft}"
-    result = _generate(model, tokenizer, system, user, max_tokens=150)
-
-    if hasattr(model, 'enable_adapter_layers'):
-        model.enable_adapter_layers()
-
-    return result
-
-
-def search_papers(vector_store, question):
-    """Find related papers (shown as references, NOT fed to model)."""
+# ============================================================
+# STEP 2: RAG search - get paper evidence
+# ============================================================
+def step2_search_papers(vector_store, question):
+    """Search knowledge base for relevant papers."""
     results = vector_store.search(question, top_k=3)
     papers = []
+    evidence = []
     seen = set()
+
     for doc in results:
         meta = doc.get("metadata", {})
         title = meta.get("title", "Unknown")
@@ -196,13 +180,61 @@ def search_papers(vector_store, question):
         score = doc.get("score", 0)
         if score < 0.40:
             continue
+
+        idx = len(papers) + 1
+        content = doc.get("content", "")[:250].replace("\n", " ").strip()
         papers.append({
-            "id": len(papers) + 1,
+            "id": idx,
             "title": title,
             "authors": meta.get("authors", "Unknown"),
             "score": score,
         })
-    return papers
+        evidence.append(f"[{idx}] {title} by {meta.get('authors','Unknown')}: {content}")
+
+    return papers, "\n".join(evidence)
+
+
+# ============================================================
+# STEP 3: Base model (adapter OFF) - SMART JUDGE
+# ============================================================
+def step3_smart_judge(model, tokenizer, question, finetuned_answer, paper_evidence, has_papers):
+    """Base model decides what to use and produces final answer."""
+    if hasattr(model, 'disable_adapter_layers'):
+        model.disable_adapter_layers()
+
+    if has_papers:
+        system = (
+            "You are a smart research assistant. You are given:\n"
+            "1) A draft answer from a domain expert\n"
+            "2) Evidence from research papers [1], [2], [3]\n\n"
+            "Your job: Decide the best way to answer.\n"
+            "- If the question is SIMPLE (like 'what is X?'), write a clean answer "
+            "using the draft. Do NOT add citations for basic definitions.\n"
+            "- If the question asks about LATEST findings, new developments, or specific research, "
+            "combine the draft with paper evidence and ADD citations like [1], [2].\n\n"
+            "Write one polished paragraph with perfect grammar. "
+            "Only cite when the question specifically needs research evidence."
+        )
+        user = (
+            f"Question: {question}\n\n"
+            f"Draft answer:\n{finetuned_answer}\n\n"
+            f"Paper evidence:\n{paper_evidence}\n\n"
+            f"Write the best final answer:"
+        )
+    else:
+        system = (
+            "You are a professional scientific writer. "
+            "Rewrite this draft with perfect grammar and clear structure. "
+            "Keep the same meaning. Write 3-4 polished sentences."
+        )
+        user = f"Question: {question}\n\nDraft:\n{finetuned_answer}"
+
+    result = _gen(model, tokenizer, system, user, max_tokens=180)
+
+    if hasattr(model, 'enable_adapter_layers'):
+        model.enable_adapter_layers()
+
+    return result
 
 
 def wrap_text(text, width=68, indent=4):
@@ -239,34 +271,36 @@ def main():
             print("\n  Goodbye!\n")
             break
 
-        # Start thinking animation
+        # Thinking animation
         stop = threading.Event()
         anim = threading.Thread(target=thinking_animation, args=(stop,), daemon=True)
         anim.start()
 
         t0 = time.time()
 
-        # STEP 1: Fine-tuned model generates domain answer
-        draft = step1_domain_answer(model, tokenizer, question)
+        # STEP 1: Fine-tuned model domain answer
+        draft = step1_finetuned_answer(model, tokenizer, question)
 
-        # STEP 2: Base model (adapter OFF) polishes with proper grammar
-        answer = step2_polish(model, tokenizer, question, draft)
+        # STEP 2: RAG search for papers
+        papers, evidence = step2_search_papers(vector_store, question)
 
-        # Find related papers (shown as references only)
-        papers = search_papers(vector_store, question)
+        # STEP 3: Base model smart judge
+        final = step3_smart_judge(
+            model, tokenizer, question, draft, evidence, len(papers) > 0
+        )
 
-        # Stop animation
         stop.set()
         anim.join()
         latency = time.time() - t0
 
-        # Display
+        # Display final answer
         print(f"  ScholarMind ({latency:.1f}s):\n")
-        print(wrap_text(answer))
+        print(wrap_text(final))
 
+        # Show sources only if papers were found
         if papers:
             print()
-            print("  Related Research:")
+            print("  References:")
             for p in papers:
                 print(f"    [{p['id']}] {p['title']}")
                 print(f"        {p['authors']}")
