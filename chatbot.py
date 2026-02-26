@@ -65,7 +65,16 @@ def load_system():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    print(f"done ({time.time() - t0:.1f}s)")
+    # Load fine-tuned LoRA adapter (56 autonomous training cycles)
+    adapters = sorted(glob.glob("models/fine_tuned_*"))
+    if adapters:
+        adapter_path = adapters[-1]
+        print(f"  Loading LoRA adapter: {os.path.basename(adapter_path)}...", end=" ", flush=True)
+        from peft import PeftModel
+        model = PeftModel.from_pretrained(model, adapter_path)
+        print("done")
+
+    print(f"  Total load time: {time.time() - t0:.1f}s")
     print()
     print("  Type your question and press Enter.")
     print("  Type 'quit' or 'exit' to stop.")
