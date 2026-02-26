@@ -4,6 +4,7 @@ Part of the ScholarMind multi-agent system.
 """
 
 import os
+import re
 import logging
 from typing import Dict, List, Optional, Tuple
 
@@ -94,10 +95,11 @@ class RAGPipeline:
                 content = content[:800] + "..."
             
             metadata = doc.get("metadata", {})
-            context_parts.append(f"[{i}] {content}")
+            title = metadata.get("title", "Unknown")
+            context_parts.append(f"[{i}] (Source: {title})\n{content}")
             citations.append({
                 "id": i,
-                "title": metadata.get("title", "Unknown"),
+                "title": title,
                 "authors": metadata.get("authors", "Unknown"),
                 "url": metadata.get("url", ""),
                 "score": doc.get("score", 0)
@@ -107,18 +109,70 @@ class RAGPipeline:
     
     def _build_prompt(self, query: str, context: str) -> str:
         """Build prompt for the LLM with retrieved context using Phi-3 format."""
-        system_msg = "You are ScholarMind, an AI research assistant specializing in LLMs and NLP. Answer based on context. Cite sources as [1], [2]."
+        system_msg = (
+            "You are ScholarMind, an expert AI research assistant specializing in "
+            "Large Language Models (LLMs), Natural Language Processing (NLP), and "
+            "machine learning. Your role is to provide clear, accurate, and well-structured "
+            "answers based on the provided research context. "
+            "Always write your answer as a direct, conversational response. "
+            "Do NOT output in Question/Answer format. "
+            "Do NOT output metadata, numbers, or instruction labels. "
+            "Cite sources using [1], [2], etc. when referencing specific papers."
+        )
         
         if context:
-            user_msg = f"CONTEXT:\n{context}\n\nQUESTION: {query}"
+            user_msg = (
+                f"Based on the following research papers, answer my question.\n\n"
+                f"RESEARCH CONTEXT:\n{context}\n\n"
+                f"MY QUESTION: {query}\n\n"
+                f"Provide a clear, direct answer:"
+            )
         else:
-            user_msg = f"QUESTION: {query}"
+            user_msg = f"{query}\n\nProvide a clear, direct answer:"
         
         prompt = f"{self.SYS_START}\n{system_msg}{self.SYS_END}\n"
         prompt += f"{self.USER_START}\n{user_msg}{self.SYS_END}\n"
         prompt += f"{self.ASST_START}\n"
         
         return prompt
+    
+    @staticmethod
+    def _clean_response(text: str) -> str:
+        """Remove training data artifacts and noise from model output."""
+        if not text:
+            return ""
+        
+        # Remove leading garbage tokens (numbers, scores, metadata)
+        # e.g., "6 9.36\nQuestion:..." or "🤖 6 9.36"
+        text = re.sub(r'^[\s\d\.\,\;\:\!\?\#\*\-\_\=\+\~\`\|\\\/\@\$\%\^\&\(\)]*(?:\d+\.?\d*\s*)+', '', text)
+        
+        # Remove "Question: ... Answer: ..." wrapper if the model dumps Q&A format
+        qa_match = re.search(r'(?:Answer|A)\s*[:\.]\s*(.+)', text, re.DOTALL | re.IGNORECASE)
+        if qa_match and 'Question:' in text[:200]:
+            text = qa_match.group(1).strip()
+        
+        # Remove instruction leakage patterns
+        patterns_to_remove = [
+            r'Instruction\s*\d+\s*\(.*?\)',       # "Instruction 2 (More Diff0"
+            r'<\|.*?\|>',                           # Any remaining special tokens
+            r'\[INST\].*?\[/INST\]',                # Instruction wrappers
+            r'###\s*(?:Human|System|User)\s*:.*?$', # Role labels at end
+        ]
+        for pattern in patterns_to_remove:
+            text = re.sub(pattern, '', text, flags=re.IGNORECASE | re.DOTALL)
+        
+        # Remove trailing incomplete sentences (cut off at last period/question mark)
+        text = text.strip()
+        if text and text[-1] not in '.!?\n"\'':
+            last_sentence_end = max(
+                text.rfind('.'),
+                text.rfind('!'),
+                text.rfind('?'),
+            )
+            if last_sentence_end > len(text) * 0.3:  # Only trim if we keep >30%
+                text = text[:last_sentence_end + 1]
+        
+        return text.strip()
     
     def query(self, question: str, top_k: Optional[int] = None) -> Dict:
         """
@@ -149,7 +203,7 @@ class RAGPipeline:
                 prompt,
                 return_tensors="pt",
                 truncation=True,
-                max_length=self.config.get("max_context_length", 4096)
+                max_length=3072  # Use more of the 4k context window
             ).to(self.model.device)
             
             with torch.no_grad():
@@ -159,51 +213,31 @@ class RAGPipeline:
                     temperature=self.config.get("temperature", 0.7),
                     top_p=self.config.get("top_p", 0.9),
                     do_sample=True,
+                    repetition_penalty=1.15,
                     pad_token_id=self.tokenizer.pad_token_id
                 )
             
-            # Decode the full response (with special tokens to help parsing)
-            full_response = self.tokenizer.decode(outputs[0], skip_special_tokens=False)
+            # Extract only the generated tokens (not the prompt)
+            generated_ids = outputs[0][inputs['input_ids'].shape[1]:]
+            answer = self.tokenizer.decode(generated_ids, skip_special_tokens=True)
             
-            # Also get clean version without special tokens
-            clean_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            # Clean up training data artifacts
+            answer = self._clean_response(answer)
             
-            # Extract just the assistant's response using multiple strategies
-            answer = None
+            # Fallback if cleaned answer is too short
+            if not answer or len(answer) < 15:
+                # Try the full decode approach as backup
+                full_response = self.tokenizer.decode(outputs[0], skip_special_tokens=False)
+                
+                if self.ASST_START in full_response:
+                    parts = full_response.split(self.ASST_START)
+                    if len(parts) > 1:
+                        answer = parts[-1]
+                        if self.SYS_END in answer:
+                            answer = answer.split(self.SYS_END)[0]
+                        answer = self._clean_response(answer)
             
-            # Strategy 1: Split by assistant token
-            if self.ASST_START in full_response:
-                parts = full_response.split(self.ASST_START)
-                if len(parts) > 1:
-                    answer = parts[-1]
-                    # Remove end token if present
-                    if self.SYS_END in answer:
-                        answer = answer.split(self.SYS_END)[0]
-                    answer = answer.strip()
-            
-            # Strategy 2: Remove input prompt from clean response
-            if not answer or len(answer) < 10:
-                # Get the input prompt text
-                input_text = self.tokenizer.decode(inputs['input_ids'][0], skip_special_tokens=True)
-                if clean_response.startswith(input_text):
-                    answer = clean_response[len(input_text):].strip()
-                else:
-                    answer = clean_response.strip()
-            
-            # Strategy 3: Just use clean response if nothing else works
-            if not answer or len(answer) < 10:
-                # Remove common prompt patterns
-                answer = clean_response
-                for pattern in ["CONTEXT:", "QUESTION:", "You are ScholarMind"]:
-                    if pattern in answer:
-                        parts = answer.split(pattern)
-                        if len(parts) > 1:
-                            answer = parts[-1]
-                answer = answer.strip()
-            
-            # Final cleanup
-            answer = answer.strip()
-            if not answer:
+            if not answer or len(answer) < 15:
                 answer = "I couldn't generate a proper response. Please try rephrasing your question."
             
         except Exception as e:
