@@ -174,33 +174,34 @@ def step2_papers(vector_store, question):
 
 
 def step3_rewrite(model, tokenizer, question, draft, evidence, has_papers):
-    """STEP 3: Base model (adapter OFF) REWRITES the draft completely."""
+    """STEP 3: Base model (adapter OFF) answers INDEPENDENTLY."""
     if hasattr(model, 'disable_adapter_layers'):
         model.disable_adapter_layers()
 
     if has_papers:
         sys_msg = (
-            "You are given a rough draft about an AI/ML topic and some research paper excerpts. "
-            "Your task: Write a COMPLETELY NEW, clean answer to the question. "
-            "Use the key ideas from the draft but rewrite everything in your own words "
-            "with perfect English grammar. "
-            "For simple definition questions (what is X): just give a clear definition, no citations. "
-            "For research questions (latest findings, developments): include citations [1], [2]. "
-            "Write exactly 3-4 clear sentences. No bullet points."
+            "You are ScholarMind, an expert AI research assistant. "
+            "Answer this question using YOUR OWN knowledge about AI and machine learning. "
+            "You are also given a rough draft from another model and some paper titles - "
+            "use these ONLY as topic hints. Do NOT copy or trust the draft's definitions - "
+            "it may contain errors. Write YOUR OWN accurate answer. "
+            "For simple questions (what is X): give a clear, correct definition. No citations needed. "
+            "For research questions (latest findings): mention relevant papers with [1], [2] citations. "
+            "Write 3-4 clear sentences with perfect grammar."
         )
         user = (
             f"Question: {question}\n\n"
-            f"Rough draft (rewrite this completely):\n{draft}\n\n"
-            f"Paper excerpts for reference:\n{evidence}\n\n"
-            f"Write a clean, new answer:"
+            f"[Topic hint from domain model - may contain errors, verify before using]:\n{draft}\n\n"
+            f"[Research papers for citation if needed]:\n{evidence}\n\n"
+            f"Now write YOUR OWN accurate answer:"
         )
     else:
         sys_msg = (
-            "You are given a rough draft about an AI/ML topic. "
-            "Write a COMPLETELY NEW, clean answer in your own words with perfect grammar. "
-            "Write exactly 3-4 clear sentences."
+            "You are ScholarMind, an expert AI research assistant. "
+            "Answer this question using YOUR OWN knowledge about AI and ML. "
+            "Write 3-4 clear sentences with perfect grammar."
         )
-        user = f"Question: {question}\n\nRough draft:\n{draft}\n\nWrite a clean answer:"
+        user = f"Question: {question}\n\nWrite your answer:"
 
     result = _gen(model, tokenizer, sys_msg, user, max_tokens=180)
 
